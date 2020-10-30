@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2019 Cypress Semiconductor Corporation. or a subsidiary of
+ * FreeRTOS Kernel V10.3.1
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Copyright (C) 2019-2020 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
  * Updated function names to be compliant with CMSIS standard names.
@@ -21,9 +23,11 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * http://www.Cypress.com
+ * http://www.FreeRTOS.org
+ * http://aws.amazon.com/freertos
+ * http://www.cypress.com
  *
- *
+ * 1 tab == 4 spaces!
  */
 
 	RSEG    CODE:CODE(2)
@@ -59,7 +63,7 @@ PendSV_Handler:
 	str r0, [r2]
 
 	stmdb sp!, {r0, r3}
-	/*vale MUST be equal to configMAX_SYSCALL_INTERRUPT_PRIORITY*/
+	/* value MUST be equal to configMAX_SYSCALL_INTERRUPT_PRIORITY */
 	mov r0, #0x3F
 	msr basepri, r0
 	dsb
@@ -84,6 +88,12 @@ PendSV_Handler:
 
 	msr psp, r0
 	isb
+	#ifdef WORKAROUND_PMU_CM001 /* XMC4000 specific errata */
+		#if WORKAROUND_PMU_CM001 == 1
+			push { r14 }
+			pop { pc }
+		#endif
+	#endif
 
 	bx r14
 

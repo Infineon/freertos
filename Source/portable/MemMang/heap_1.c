@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2019 Cypress Semiconductor Corporation. or a subsidiary of
+ * FreeRTOS Kernel V10.3.1
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Copyright (C) 2019-2020 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
- * Added support of memory allocation scheme selection from the FreeRTOSConfih.h
+ * Added support of memory allocation scheme selection from the FreeRTOSConfig.h
  * file using configHEAP_ALLOCATION_SCHEME macro.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -22,10 +24,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * http://www.Cypress.com
+ * http://www.FreeRTOS.org
+ * http://aws.amazon.com/freertos
+ * http://www.cypress.com
  *
- *
+ * 1 tab == 4 spaces!
  */
+
 
 /*
  * The simplest possible implementation of pvPortMalloc().  Note that this
@@ -60,7 +65,6 @@ task.h is included from an application file. */
 /* A few bytes might be lost to byte aligning the heap start address. */
 #define configADJUSTED_HEAP_SIZE	( configTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT )
 
-/* Allocate the memory for the heap. */
 /* Allocate the memory for the heap. */
 #if( configAPPLICATION_ALLOCATED_HEAP == 1 )
 	/* The application writer has already defined the array used for the RTOS

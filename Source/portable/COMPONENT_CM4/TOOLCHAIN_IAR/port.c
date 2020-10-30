@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2019 Cypress Semiconductor Corporation. or a subsidiary of
+ * FreeRTOS Kernel V10.3.1
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Copyright (C) 2019-2020 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
- * Removed ARM_CM7 specific code.
  * Added default implementations of malloc failed and stack overflow hook functions.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -22,9 +23,11 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * http://www.Cypress.com
+ * http://www.FreeRTOS.org
+ * http://aws.amazon.com/freertos
+ * http://www.cypress.com
  *
- *
+ * 1 tab == 4 spaces!
  */
 
 /*-----------------------------------------------------------
@@ -37,6 +40,9 @@
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
+
+/* Library includes. */
+#include "cy_utils.h"
 
 #ifndef __ARMVFP__
 	#error This port can only be used when the project options are configured to enable hardware floating point support.
@@ -68,6 +74,12 @@
 #define portNVIC_PENDSVCLEAR_BIT 			( 1UL << 27UL )
 #define portNVIC_PEND_SYSTICK_CLEAR_BIT		( 1UL << 25UL )
 
+/* Constants used to detect a Cortex-M7 r0p1 core, which should use the ARM_CM7
+r0p1 port. */
+#define portCPUID							( * ( ( volatile uint32_t * ) 0xE000ed00 ) )
+#define portCORTEX_M7_r0p1_ID				( 0x410FC271UL )
+#define portCORTEX_M7_r0p0_ID				( 0x410FC270UL )
+
 #define portNVIC_PENDSV_PRI					( ( ( uint32_t ) configKERNEL_INTERRUPT_PRIORITY ) << 16UL )
 #define portNVIC_SYSTICK_PRI				( ( ( uint32_t ) configKERNEL_INTERRUPT_PRIORITY ) << 24UL )
 
@@ -95,23 +107,14 @@
 /* The systick is a 24-bit counter. */
 #define portMAX_24_BIT_NUMBER				( 0xffffffUL )
 
-/* For strict compliance with the Cortex-M spec the task start address should
-have bit-0 clear, as it is loaded into the PC on exit from an ISR. */
-#define portSTART_ADDRESS_MASK        ( ( StackType_t ) 0xfffffffeUL )
-
 /* A fiddle factor to estimate the number of SysTick counts that would have
 occurred while the SysTick counter is stopped during tickless idle
 calculations. */
 #define portMISSED_COUNTS_FACTOR			( 45UL )
 
-/* Let the user override the pre-loading of the initial LR with the address of
-prvTaskExitError() in case it messes up unwinding of the stack in the
-debugger. */
-#ifdef configTASK_RETURN_ADDRESS
-    #define portTASK_RETURN_ADDRESS    configTASK_RETURN_ADDRESS
-#else
-    #define portTASK_RETURN_ADDRESS    prvTaskExitError
-#endif
+/* For strict compliance with the Cortex-M spec the task start address should
+have bit-0 clear, as it is loaded into the PC on exit from an ISR. */
+#define portSTART_ADDRESS_MASK				( ( StackType_t ) 0xfffffffeUL )
 
 /*
  * Setup the timer to generate the tick interrupts.  The implementation in this
@@ -200,7 +203,7 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 	pxTopOfStack--;
 	*pxTopOfStack = ( ( StackType_t ) pxCode ) & portSTART_ADDRESS_MASK;	/* PC */
 	pxTopOfStack--;
-    *pxTopOfStack = ( StackType_t ) portTASK_RETURN_ADDRESS;    /* LR */
+	*pxTopOfStack = ( StackType_t ) prvTaskExitError;	/* LR */
 
 	/* Save code space by skipping register initialisation. */
 	pxTopOfStack -= 5;	/* R12, R3, R2 and R1. */
@@ -239,6 +242,12 @@ BaseType_t xPortStartScheduler( void )
 	/* configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to 0.
 	See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html */
 	configASSERT( configMAX_SYSCALL_INTERRUPT_PRIORITY );
+
+	/* This port can be used on all revisions of the Cortex-M7 core other than
+	the r0p1 parts.  r0p1 parts should use the port from the
+	/source/portable/GCC/ARM_CM7/r0p1 directory. */
+	configASSERT( portCPUID != portCORTEX_M7_r0p1_ID );
+	configASSERT( portCPUID != portCORTEX_M7_r0p0_ID );
 
 	#if( configASSERT_DEFINED == 1 )
 	{
@@ -321,12 +330,6 @@ BaseType_t xPortStartScheduler( void )
 
 	/* Start the first task. */
 	vPortStartFirstTask();
-
-    /* Should never get here as the tasks will now be executing!  Call the task
-    exit error function to prevent compiler warnings about a static function
-    not being called in the case that the application writer overrides this
-    functionality by defining configTASK_RETURN_ADDRESS. */
-    prvTaskExitError();
 
 	/* Should not get here! */
 	return 0;
@@ -548,7 +551,7 @@ void xPortSysTickHandler( void )
 			vTaskStepTick( ulCompleteTickPeriods );
 			portNVIC_SYSTICK_LOAD_REG = ulTimerCountsForOneTick - 1UL;
 
-			/* Exit with interrpts enabled. */
+			/* Exit with interrupts enabled. */
 			__enable_interrupt();
 		}
 	}
@@ -642,7 +645,7 @@ __weak void vPortSetupTimerInterrupt( void )
 #endif /* configASSERT_DEFINED */
 
 #if configUSE_MALLOC_FAILED_HOOK == 1
-    __WEAK void vApplicationMallocFailedHook( void )
+    __attribute__((weak)) void vApplicationMallocFailedHook( void )
     {
         /* The heap space has been exceeded. */
         taskDISABLE_INTERRUPTS();
@@ -654,7 +657,7 @@ __weak void vPortSetupTimerInterrupt( void )
 #endif
 
 #if configCHECK_FOR_STACK_OVERFLOW  != 0
-    __WEAK void vApplicationStackOverflowHook( TaskHandle_t xTask, signed char *pcTaskName )
+    __attribute__((weak)) void vApplicationStackOverflowHook( TaskHandle_t xTask, signed char *pcTaskName )
     {
         (void)xTask;
         (void)pcTaskName;

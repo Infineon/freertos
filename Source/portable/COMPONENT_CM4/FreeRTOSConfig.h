@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2019 Cypress Semiconductor Corporation. or a subsidiary of
+ * FreeRTOS Kernel V10.3.1
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Copyright (C) 2019-2020 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
  * Updated configuration to support PSoC 6 MCU.
@@ -21,8 +23,9 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * http://www.Cypress.com
- *
+ * http://www.FreeRTOS.org
+ * http://aws.amazon.com/freertos
+ * http://www.cypress.com
  *
  */
 
@@ -41,13 +44,20 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
+#include "cy_utils.h"
 #include "cy_syslib.h"
+
+/* Get the low power configuration parameters from
+ * the ModusToolbox Device Configurator GeneratedSource:
+ * CY_CFG_PWR_SYS_IDLE_MODE     - System Idle Power Mode
+ * CY_CFG_PWR_DEEPSLEEP_LATENCY - Deep Sleep Latency (ms)
+ */
+#include "cycfg_system.h"
 
 #warning This is a template. Copy this file to your project and remove this line. Refer to FreeRTOS README.md for usage details.
 
 #define configUSE_PREEMPTION                    1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
-#define configUSE_TICKLESS_IDLE                 0
 #define configCPU_CLOCK_HZ                      SystemCoreClock
 #define configTICK_RATE_HZ                      1000u
 #define configMAX_PRIORITIES                    7
@@ -56,18 +66,17 @@
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
 #define configUSE_TASK_NOTIFICATIONS            1
-#define configUSE_MUTEXES                       0
-#define configUSE_RECURSIVE_MUTEXES             0
-#define configUSE_COUNTING_SEMAPHORES           0
+#define configUSE_MUTEXES                       1
+#define configUSE_RECURSIVE_MUTEXES             1
+#define configUSE_COUNTING_SEMAPHORES           1
 #define configQUEUE_REGISTRY_SIZE               10
 #define configUSE_QUEUE_SETS                    0
 #define configUSE_TIME_SLICING                  0
-#define configUSE_NEWLIB_REENTRANT              0
 #define configENABLE_BACKWARD_COMPATIBILITY     0
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 
 /* Memory allocation related definitions. */
-#define configSUPPORT_STATIC_ALLOCATION         0
+#define configSUPPORT_STATIC_ALLOCATION         1
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
 #define configTOTAL_HEAP_SIZE                   10240
 #define configAPPLICATION_ALLOCATED_HEAP        0
@@ -76,12 +85,12 @@
 #define configUSE_IDLE_HOOK                     0
 #define configUSE_TICK_HOOK                     0
 #define configCHECK_FOR_STACK_OVERFLOW          2
-#define configUSE_MALLOC_FAILED_HOOK            0
+#define configUSE_MALLOC_FAILED_HOOK            1
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
 /* Run time and task stats gathering related definitions. */
 #define configGENERATE_RUN_TIME_STATS           0
-#define configUSE_TRACE_FACILITY                0
+#define configUSE_TRACE_FACILITY                1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    0
 
 /* Co-routine related definitions. */
@@ -93,9 +102,6 @@
 #define configTIMER_TASK_PRIORITY               3
 #define configTIMER_QUEUE_LENGTH                10
 #define configTIMER_TASK_STACK_DEPTH            configMINIMAL_STACK_SIZE
-
-/* FreeRTOS MPU specific definitions. */
-#define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS 0
 
 /*
 Interrupt nesting behavior configuration.
@@ -120,7 +126,7 @@ PSoC 6 __NVIC_PRIO_BITS = 3
 2
 3
 4
-5           
+5
 6
 7 (low)     KERNEL_INTERRUPT_PRIORITY       111xxxxx (0xFF)
 
@@ -131,10 +137,10 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html
 
 /* Put KERNEL_INTERRUPT_PRIORITY in top __NVIC_PRIO_BITS bits of CM4 register */
 #define configKERNEL_INTERRUPT_PRIORITY         0xFF
-/* 
+/*
 Put MAX_SYSCALL_INTERRUPT_PRIORITY in top __NVIC_PRIO_BITS bits of CM4 register
-NOTE For IAR compiler make sure that changes of this macro is reflected in  
-file portable\IAR\CM4F\portasm.s in PendSV_Handler: routine
+NOTE For IAR compiler make sure that changes of this macro is reflected in
+file portable\TOOLCHAIN_IAR\COMPONENT_CM4\portasm.s in PendSV_Handler: routine
 */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x3F
 /* configMAX_API_CALL_INTERRUPT_PRIORITY is a new name for configMAX_SYSCALL_INTERRUPT_PRIORITY
@@ -157,14 +163,18 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetIdleTaskHandle          0
 #define INCLUDE_eTaskGetState                   0
 #define INCLUDE_xEventGroupSetBitFromISR        1
-#define INCLUDE_xTimerPendFunctionCall          0
+#define INCLUDE_xTimerPendFunctionCall          1
 #define INCLUDE_xTaskAbortDelay                 0
 #define INCLUDE_xTaskGetHandle                  0
 #define INCLUDE_xTaskResumeFromISR              1
 
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
-#define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
+#if defined(NDEBUG)
+#define configASSERT( x ) CY_UNUSED_PARAMETER( x )
+#else
+#define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); CY_HALT(); }
+#endif
 
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
 standard names - or at least those used in the unmodified vector table. */
@@ -173,13 +183,54 @@ standard names - or at least those used in the unmodified vector table. */
 #define xPortSysTickHandler SysTick_Handler
 
 /* Dynamic Memory Allocation Schemes */
-#define HEAP_ALLOCATION_TYPE1                       (1)     /* heap_1.c*/
-#define HEAP_ALLOCATION_TYPE2                       (2)     /* heap_2.c*/
-#define HEAP_ALLOCATION_TYPE3                       (3)     /* heap_3.c*/
-#define HEAP_ALLOCATION_TYPE4                       (4)     /* heap_4.c*/
-#define HEAP_ALLOCATION_TYPE5                       (5)     /* heap_5.c*/
-#define NO_HEAP_ALLOCATION                          (0)
+#define HEAP_ALLOCATION_TYPE1                   (1)     /* heap_1.c*/
+#define HEAP_ALLOCATION_TYPE2                   (2)     /* heap_2.c*/
+#define HEAP_ALLOCATION_TYPE3                   (3)     /* heap_3.c*/
+#define HEAP_ALLOCATION_TYPE4                   (4)     /* heap_4.c*/
+#define HEAP_ALLOCATION_TYPE5                   (5)     /* heap_5.c*/
+#define NO_HEAP_ALLOCATION                      (0)
 
-#define configHEAP_ALLOCATION_SCHEME                (HEAP_ALLOCATION_TYPE1)
+#define configHEAP_ALLOCATION_SCHEME            (HEAP_ALLOCATION_TYPE3)
+
+/* Check if the ModusToolbox Device Configurator Power personality parameter
+ * "System Idle Power Mode" is set to either "CPU Sleep" or "System Deep Sleep".
+ */
+#if defined(CY_CFG_PWR_SYS_IDLE_MODE) && \
+    ((CY_CFG_PWR_SYS_IDLE_MODE == CY_CFG_PWR_MODE_SLEEP) || \
+     (CY_CFG_PWR_SYS_IDLE_MODE == CY_CFG_PWR_MODE_DEEPSLEEP))
+
+/* Enable low power tickless functionality. The RTOS abstraction library
+ * provides the compatible implementation of the vApplicationSleep hook:
+ * https://github.com/cypresssemiconductorco/abstraction-rtos#freertos
+ * The Low Power Assistant library provides additional portable configuration layer
+ * for low-power features supported by the PSoC 6 devices:
+ * https://github.com/cypresssemiconductorco/lpa
+ */
+extern void vApplicationSleep( uint32_t xExpectedIdleTime );
+#define portSUPPRESS_TICKS_AND_SLEEP( xIdleTime ) vApplicationSleep( xIdleTime )
+#define configUSE_TICKLESS_IDLE                 2
+
+#else
+#define configUSE_TICKLESS_IDLE                 0
+#endif
+
+/* Deep Sleep Latency Configuration */
+#if( CY_CFG_PWR_DEEPSLEEP_LATENCY > 0 )
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP   CY_CFG_PWR_DEEPSLEEP_LATENCY
+#endif
+
+/* Allocate newlib reeentrancy structures for each RTOS task.
+ * The system behavior is toolchain-specific.
+ *
+ * GCC toolchain: the application must provide the implementation for the required
+ * newlib hook functions: __malloc_lock, __malloc_unlock, __env_lock, __env_unlock.
+ * FreeRTOS-compatible implementation is provided by the clib-support library:
+ * https://github.com/cypresssemiconductorco/clib-support
+ *
+ * ARM/IAR toolchains: the application must provide the reent.h header to adapt
+ * FreeRTOS's configUSE_NEWLIB_REENTRANT to work with the toolchain-specific C library.
+ * The compatible implementations are also provided by the clib-support library.
+ */
+#define configUSE_NEWLIB_REENTRANT              1
 
 #endif /* FREERTOS_CONFIG_H */
