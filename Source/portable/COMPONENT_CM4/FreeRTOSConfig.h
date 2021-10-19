@@ -1,7 +1,7 @@
 /*
- * FreeRTOS Kernel V10.3.1
+ * FreeRTOS Kernel V10.4.3
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
- * Copyright (C) 2019-2020 Cypress Semiconductor Corporation, or a subsidiary of
+ * Copyright (C) 2019-2021 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
  * Updated configuration to support PSoC 6 MCU.
@@ -23,8 +23,8 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * http://www.FreeRTOS.org
- * http://aws.amazon.com/freertos
+ * https://www.FreeRTOS.org
+ * https://github.com/FreeRTOS
  * http://www.cypress.com
  *
  */
@@ -45,7 +45,6 @@
  *----------------------------------------------------------*/
 
 #include "cy_utils.h"
-#include "cy_syslib.h"
 
 /* Get the low power configuration parameters from
  * the ModusToolbox Device Configurator GeneratedSource:
@@ -58,6 +57,7 @@
 
 #define configUSE_PREEMPTION                    1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
+extern uint32_t SystemCoreClock;
 #define configCPU_CLOCK_HZ                      SystemCoreClock
 #define configTICK_RATE_HZ                      1000u
 #define configMAX_PRIORITIES                    7
@@ -71,7 +71,7 @@
 #define configUSE_COUNTING_SEMAPHORES           1
 #define configQUEUE_REGISTRY_SIZE               10
 #define configUSE_QUEUE_SETS                    0
-#define configUSE_TIME_SLICING                  0
+#define configUSE_TIME_SLICING                  1
 #define configENABLE_BACKWARD_COMPATIBILITY     0
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 
@@ -101,7 +101,7 @@
 #define configUSE_TIMERS                        1
 #define configTIMER_TASK_PRIORITY               3
 #define configTIMER_QUEUE_LENGTH                10
-#define configTIMER_TASK_STACK_DEPTH            configMINIMAL_STACK_SIZE
+#define configTIMER_TASK_STACK_DEPTH            ( configMINIMAL_STACK_SIZE * 2 )
 
 /*
 Interrupt nesting behavior configuration.
