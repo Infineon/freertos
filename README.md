@@ -2,9 +2,9 @@
 
 ## Overview
 
-FreeRTOS is supplied as standard C source files built along with the other C files in your project. This repository contains a port of the FreeRTOS kernel for Infineon MCUs based on Arm&reg; Cortex&reg;-M0 (CM0), Cortex&reg;-M0+ (CM0P), Cortex&reg;-M4 (CM4), and Cortex&reg;-M33 (CM33) cores.
+FreeRTOS is supplied as standard C source files built along with the other C files in your project. This repository contains a port of the FreeRTOS kernel for Infineon MCUs based on Arm&reg; Cortex&reg;-M0 (CM0), Cortex&reg;-M0+ (CM0P), Cortex&reg;-M4 (CM4), Cortex&reg;-M33 (CM33), and Cortex&reg;-R4 (CR4) cores.
 
-**Note:** Cortex&reg;-M33 (CM33) is currently supported only on GCC_ARM
+**Note:** Cortex&reg;-M33 (CM33) and Cortex&reg;-R4 (CR4) are currently supported only on GCC_ARM
 
 See the FreeRTOS API documentation at <a href="https://www.freertos.org/a00106.html" target="_blank">FreeRTOS web page</a>.
 
@@ -46,7 +46,7 @@ Do the following to create a simple FreeRTOS application:
     COMPONENTS+=FREERTOS
     ```
 
-3. Copy the *FreeRTOSConfig.h* file from the *freertos/Source/portable/COMPONENT_$(CORE)* folder to your project, where $(CORE) is the target Arm&reg; Cortex&reg;-M CPU core (CM0, CM0P, CM4 or CM33).
+3. Copy the *FreeRTOSConfig.h* file from the *freertos/Source/portable/COMPONENT_$(CORE)* folder to your project, where $(CORE) is the target Arm&reg; Cortex&reg;-M CPU core (CM0, CM0P, CM4, CM33 or CR4).
 
 4. Open the copied *FreeRTOSConfig.h* file and remove the `#warning This is a template.` line.
 
@@ -250,7 +250,7 @@ See the following resources for more details on newlib reentrancy support:
 ## More information
 
 - [FreeRTOS RELEASE.md](./RELEASE.md)
-- [FreeRTOS API documentation](http://www.freertos.org/a00106.html)
+- [FreeRTOS API documentation](https://infineon.github.io/freertos/api_reference_manual/html/index.html)
 - [FreeRTOS homepage](https://www.freertos.org/index.html)
 - [ModusToolbox&trade; software environment, quick start guide, documentation, and videos](https://www.cypress.com/products/modustoolbox-software-environment)
 - [PSoC&trade; 6 technical reference manuals](https://www.cypress.com/search/all?f%5B0%5D=meta_type%3Atechnical_documents&f%5B1%5D=resource_meta_type%3A583&f%5B2%5D=field_related_products%3A114026)

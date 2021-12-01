@@ -6,7 +6,7 @@
     <detaileddescription>
 <para><verbatim></verbatim></para><sect1 id="index_1section_introduction">
 <title>Introduction</title>
-<para>FreeRTOS is supplied as standard C source files built along with the other C files in your project. This repository contains a port of FreeRTOS kernel for Infineon MCUs based on Arm<registered/> Cortex<registered/>-M0 (CM0), Cortex<registered/>-M0+ (CM0P), Cortex<registered/>-M4 (CM4), and Cortex<registered/>-M33 (CM33) cores. <simplesect kind="note"><para>Cortex<registered/> M33 (CM33) is currently supported only on GCC_ARM</para></simplesect>
+<para>FreeRTOS is supplied as standard C source files built along with the other C files in your project. This repository contains a port of FreeRTOS kernel for Infineon MCUs based on Arm<registered/> Cortex<registered/>-M0 (CM0), Cortex<registered/>-M0+ (CM0P), Cortex<registered/>-M4 (CM4), Cortex<registered/>-M33 (CM33), and Cortex<registered/>-R4 (CR4) cores. <simplesect kind="note"><para>Cortex<registered/> M33 (CM33) and Cortex<registered/> R4 (CR4) are currently supported only on GCC_ARM</para></simplesect>
 Additional information about using this library in ModusToolbox<trademark/> software including a <ulink url="https://github.com/Infineon/freertos/blob/master/README.md#quick-start">Quick Start</ulink> guide can be found in the library&apos;s <ulink url="https://github.com/Infineon/freertos/blob/master/README.md">README.md</ulink> file.</para></sect1>
 <sect1 id="index_1section_FreeRTOS_API_Reference">
 <title>FreeRTOS API reference</title>
