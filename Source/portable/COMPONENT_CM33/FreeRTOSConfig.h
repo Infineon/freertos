@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.3
+ * FreeRTOS Kernel V10.4.3 LTS Patch 2
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2019-2021 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
@@ -59,7 +59,9 @@
 
 #define configUSE_PREEMPTION                    1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
+#if defined (__ICCARM__) || (__GNUC__)
 extern uint32_t SystemCoreClock;
+#endif
 #define configCPU_CLOCK_HZ                      SystemCoreClock
 #define configTICK_RATE_HZ                      ((TickType_t ) 1000)
 #define configMAX_PRIORITIES                    7
@@ -194,7 +196,7 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
 #endif
 
 /* Deep Sleep Latency Configuration */
-#if( CY_CFG_PWR_DEEPSLEEP_LATENCY > 0 )
+#if ( CY_CFG_PWR_DEEPSLEEP_LATENCY > 0 )
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP   CY_CFG_PWR_DEEPSLEEP_LATENCY
 #endif
 

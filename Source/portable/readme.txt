@@ -12,7 +12,9 @@ specific files the directory contains.
 
 
 
-For example, if you are interested in the [compiler] port for the [core]
-, then the port specific files are contained in FreeRTOS/Source/Portable/COMPONENT_[core]/TOOLCHAIN_[compiler] directory.
-Other directories are ignored by the ModusToolbox build system
-as long as the $(CORE) and $(TOOLCHAIN) make variables are set correctly.
+For example, if you are interested in the [compiler] port for the [architecture]
+microcontroller, then the port specific files are contained in
+FreeRTOS/Source/Portable/[compiler]/[architecture] directory.  If this is the
+only port you are interested in then all the other directories can be
+ignored.
+

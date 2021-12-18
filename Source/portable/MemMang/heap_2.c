@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.3 LTS Patch 1
+ * FreeRTOS Kernel V10.4.3 LTS Patch 2
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2019-2020 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
@@ -128,7 +128,7 @@ static size_t xFreeBytesRemaining = configADJUSTED_HEAP_SIZE;
     }
 /*-----------------------------------------------------------*/
 
-void *pvPortMalloc( size_t xWantedSize )
+void * pvPortMalloc( size_t xWantedSize )
 {
     BlockLink_t * pxBlock, * pxPreviousBlock, * pxNewBlockLink;
     static BaseType_t xHeapHasBeenInitialised = pdFALSE;

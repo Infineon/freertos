@@ -1,0 +1,1 @@
+FreeRTOS-Kernel V10.4.3 LTS Patch 2

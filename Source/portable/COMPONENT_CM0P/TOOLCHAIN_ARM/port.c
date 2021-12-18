@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.3 LTS Patch 1
+ * FreeRTOS Kernel V10.4.3 LTS Patch 2
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2020 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
@@ -411,7 +411,7 @@ __attribute__( ( weak ) ) void vPortSetupTimerInterrupt( void )
      * If lower versions of mtb-pdl-cat1 is used, Systick handler does not get overwritten
      * Re-registration in this case will cause no harm.
      */
-    #if defined (COMPONENT_CAT1)
+    #if defined (COMPONENT_CAT1) 
     NVIC_SetVector (SysTick_IRQn, (long unsigned int)&xPortSysTickHandler);
     #endif
 }

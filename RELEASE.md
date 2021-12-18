@@ -12,6 +12,10 @@ See [README.md](./README.md) for a complete description of FreeRTOS.
 
 ## Changelog
 
+### v10.4.302
+
+- Updated to upstream FreeRTOS kernel version 10.4.3 LTS Patch 2
+
 ### v10.4.4
 
 - Added Cortex&reg;-R4 (CR4) support based on upstream FreeRTOS kernel version 10.4.3 LTS Patch 1
