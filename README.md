@@ -2,9 +2,9 @@
 
 ## Overview
 
-FreeRTOS is supplied as standard C source files built along with the other C files in your project. This repository contains a port of the FreeRTOS kernel for Infineon MCUs based on Arm&reg; Cortex&reg;-M0 (CM0), Cortex&reg;-M0+ (CM0P), Cortex&reg;-M4 (CM4), Cortex&reg;-M33 (CM33), and Cortex&reg;-R4 (CR4) cores.
+FreeRTOS is supplied as standard C source files built along with the other C files in your project. This repository contains a port of the FreeRTOS kernel for Infineon MCUs based on Arm&reg; Cortex&reg;-M0 (CM0), Cortex&reg;-M0+ (CM0P), Cortex&reg;-M4 (CM4), Cortex&reg;-M33 (CM33), Cortex&reg;-R4 (CR4) and Cortex&reg;-M7 (CM7) cores.
 
-**Note:** Cortex&reg;-M33 (CM33) and Cortex&reg;-R4 (CR4) are currently supported only on GCC_ARM
+**Note:** Cortex&reg;-R4 (CR4) is currently supported only on GCC_ARM
 
 See the FreeRTOS API documentation at <a href="https://www.freertos.org/a00106.html" target="_blank">FreeRTOS web page</a>.
 
@@ -46,7 +46,7 @@ Do the following to create a simple FreeRTOS application:
     COMPONENTS+=FREERTOS
     ```
 
-3. Copy the *FreeRTOSConfig.h* file from the *freertos/Source/portable/COMPONENT_$(CORE)* folder to your project, where $(CORE) is the target Arm&reg; Cortex&reg;-M CPU core (CM0, CM0P, CM4, CM33 or CR4).
+3. Copy the *FreeRTOSConfig.h* file from the *freertos/Source/portable/COMPONENT_$(CORE)* folder to your project, where $(CORE) is the target Arm&reg; Cortex&reg;-M CPU core (CM0, CM0P, CM4, CM33, CR4 or CM7).
 
 4. Open the copied *FreeRTOSConfig.h* file and remove the `#warning This is a template.` line.
 
@@ -131,7 +131,7 @@ To configure FreeRTOS, copy the pre-configured *FreeRTOSConfig.h* file from the 
 
 See the <a href="http://www.freertos.org/a00110.html" target="_blank">Customization</a> documentation for configuration options available in the *FreeRTOSConfig.h* file.
 
-The following configuration values are especially important to CM0, CM0P, CM4, and CM33 FreeRTOS ports:
+The following configuration values are especially important to CM0, CM0P, CM4, CM33, CR4 and CM7 FreeRTOS ports:
 
 - [`configCPU_CLOCK_HZ`](#configcpu_clock_hz)
 - [`configMAX_SYSCALL_INTERRUPT_PRIORITY`](#configmax_syscall_interrupt_priority)

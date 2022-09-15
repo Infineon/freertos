@@ -3,7 +3,7 @@
 ## What's included?
 
 - FreeRTOS kernel 10.4.3
-- Ports for GCC, IAR, Arm&reg; compilers and Cortex&reg;-M0 (CM0), Cortex&reg;-M0+ (CM0P), Cortex&reg;-M4 (CM4), Cortex&reg;-M33 (CM33), and Cortex&reg;-R4 (CR4) CPUs
+- Ports for GCC, IAR, Arm&reg; compilers and Cortex&reg;-M0 (CM0), Cortex&reg;-M0+ (CM0P), Cortex&reg;-M4 (CM4), Cortex&reg;-M33 (CM33), Cortex&reg;-R4 (CR4) and Cortex&reg;-M7 (CM7) CPUs
 - *FreeRTOSConfig.h* template with the recommended configuration options
 - Cortex&reg;-M33 (CM33) and Cortex&reg;-R4 (CR4) are currently supported only on GCC_ARM
 
@@ -11,6 +11,10 @@ See [README.md](./README.md) for a complete description of FreeRTOS.
 
 
 ## Changelog
+
+### v10.4.303
+
+- Added Cortex&reg;-M7 (CM7) support based on upstream FreeRTOS kernel version 10.4.3 LTS Patch 2
 
 ### v10.4.302
 

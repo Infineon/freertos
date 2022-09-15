@@ -4,7 +4,7 @@
  * Copyright (C) 2019-2021 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
- * Updated configuration to support PSoC 4 MCU.
+ * Updated configuration to support PSoC 6 MCU.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -78,7 +78,7 @@ extern uint32_t SystemCoreClock;
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         1
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
-#define configTOTAL_HEAP_SIZE                   1024
+#define configTOTAL_HEAP_SIZE                   10240
 #define configAPPLICATION_ALLOCATED_HEAP        0
 
 /* Hook function related definitions. */
@@ -102,6 +102,50 @@ extern uint32_t SystemCoreClock;
 #define configTIMER_TASK_PRIORITY               3
 #define configTIMER_QUEUE_LENGTH                10
 #define configTIMER_TASK_STACK_DEPTH            ( configMINIMAL_STACK_SIZE * 2 )
+
+/*
+Interrupt nesting behavior configuration.
+This is explained here: http://www.freertos.org/a00110.html
+
+Priorities are controlled by two macros:
+- configKERNEL_INTERRUPT_PRIORITY determines the priority of the RTOS daemon task
+- configMAX_API_CALL_INTERRUPT_PRIORITY dictates the priority of ISRs that make API calls
+
+Notes:
+1. Interrupts that do not call API functions should be >= configKERNEL_INTERRUPT_PRIORITY
+   and will nest.
+2. Interrupts that call API functions must have priority between KERNEL_INTERRUPT_PRIORITY
+   and MAX_API_CALL_INTERRUPT_PRIORITY (inclusive).
+3. Interrupts running above MAX_API_CALL_INTERRUPT_PRIORITY are never delayed by the OS.
+*/
+/*
+PSoC 6 __NVIC_PRIO_BITS = 3
+
+0 (high)
+1           MAX_API_CALL_INTERRUPT_PRIORITY 001xxxxx (0x3F)
+2
+3
+4
+5
+6
+7 (low)     KERNEL_INTERRUPT_PRIORITY       111xxxxx (0xFF)
+
+!!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
+See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html
+
+*/
+
+/* Put KERNEL_INTERRUPT_PRIORITY in top __NVIC_PRIO_BITS bits of CM7 register */
+#define configKERNEL_INTERRUPT_PRIORITY         0xFF
+/*
+Put MAX_SYSCALL_INTERRUPT_PRIORITY in top __NVIC_PRIO_BITS bits of CM7 register
+NOTE For IAR compiler make sure that changes of this macro is reflected in
+file portable\TOOLCHAIN_IAR\COMPONENT_CM7\portasm.s in PendSV_Handler: routine
+*/
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x3F
+/* configMAX_API_CALL_INTERRUPT_PRIORITY is a new name for configMAX_SYSCALL_INTERRUPT_PRIORITY
+ that is used by newer ports only. The two are equivalent. */
+#define configMAX_API_CALL_INTERRUPT_PRIORITY   configMAX_SYSCALL_INTERRUPT_PRIORITY
 
 
 /* Set the following definitions to 1 to include the API function, or zero
@@ -158,11 +202,13 @@ standard names - or at least those used in the unmodified vector table. */
 /* Enable low power tickless functionality. The RTOS abstraction library
  * provides the compatible implementation of the vApplicationSleep hook:
  * https://github.com/cypresssemiconductorco/abstraction-rtos#freertos
+ * The Low Power Assistant library provides additional portable configuration layer
+ * for low-power features supported by the PSoC 6 devices:
+ * https://github.com/cypresssemiconductorco/lpa
  */
 extern void vApplicationSleep( uint32_t xExpectedIdleTime );
 #define portSUPPRESS_TICKS_AND_SLEEP( xIdleTime ) vApplicationSleep( xIdleTime )
 #define configUSE_TICKLESS_IDLE                 2
-
 #else
 #define configUSE_TICKLESS_IDLE                 0
 #endif
