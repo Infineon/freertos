@@ -12,10 +12,6 @@ See [README.md](./README.md) for a complete description of FreeRTOS.
 
 ## Changelog
 
-### v10.4.304
-
-- Created a common section for frequently called freertos functions
-
 ### v10.4.303
 
 - Added Cortex&reg;-M7 (CM7) support based on upstream FreeRTOS kernel version 10.4.3 LTS Patch 2
@@ -86,11 +82,11 @@ This version of FreeRTOS was validated for compatibility with the following soft
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software environment                       | 3.0     |
-| Peripheral driver library (`mtb-pdl-cat1`)                | 3.0.0   |
+| ModusToolbox&trade; software environment                       | 2.4     |
+| Peripheral driver library (`mtb-pdl-cat1`)                | 2.2.1   |
 | GCC compiler                                            | 10.3.1  |
-| IAR compiler                                            | 9.30    |
-| Arm&reg; compiler 6                                          | 6.16    |
+| IAR compiler                                            | 8.32    |
+| Arm&reg; compiler 6                                          | 6.14    |
 
 
 ## Known issues
