@@ -39,7 +39,6 @@
  * header files. */
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
-FREERTOS_COMMON_SECTION_BEGIN
 void vRestoreContextOfFirstTask( void ) /* __attribute__ (( naked )) PRIVILEGED_FUNCTION */
 {
     __asm volatile
@@ -109,8 +108,6 @@ void vRestoreContextOfFirstTask( void ) /* __attribute__ (( naked )) PRIVILEGED_
         #endif /* configENABLE_MPU */
     );
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
 BaseType_t xIsPrivileged( void ) /* __attribute__ (( naked )) */
@@ -156,7 +153,6 @@ void vResetPrivilege( void ) /* __attribute__ (( naked )) */
 }
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void vStartFirstTask( void ) /* __attribute__ (( naked )) PRIVILEGED_FUNCTION */
 {
     __asm volatile
@@ -177,8 +173,6 @@ void vStartFirstTask( void ) /* __attribute__ (( naked )) PRIVILEGED_FUNCTION */
         ::"i" ( portSVC_START_SCHEDULER ) : "memory"
     );
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
 uint32_t ulSetInterruptMask( void ) /* __attribute__(( naked )) PRIVILEGED_FUNCTION */
@@ -196,7 +190,6 @@ uint32_t ulSetInterruptMask( void ) /* __attribute__(( naked )) PRIVILEGED_FUNCT
 }
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void vClearInterruptMask( __attribute__( ( unused ) ) uint32_t ulMask ) /* __attribute__(( naked )) PRIVILEGED_FUNCTION */
 {
     __asm volatile
@@ -208,10 +201,8 @@ void vClearInterruptMask( __attribute__( ( unused ) ) uint32_t ulMask ) /* __att
         ::: "memory"
     );
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
-FREERTOS_COMMON_SECTION_BEGIN
+
 void PendSV_Handler( void ) /* __attribute__ (( naked )) PRIVILEGED_FUNCTION */
 {
     __asm volatile
@@ -309,10 +300,8 @@ void PendSV_Handler( void ) /* __attribute__ (( naked )) PRIVILEGED_FUNCTION */
         ::"i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY )
     );
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
-FREERTOS_COMMON_SECTION_BEGIN
+
 void SVC_Handler( void ) /* __attribute__ (( naked )) PRIVILEGED_FUNCTION */
 {
     __asm volatile
@@ -328,6 +317,4 @@ void SVC_Handler( void ) /* __attribute__ (( naked )) PRIVILEGED_FUNCTION */
         "svchandler_address_const: .word vPortSVCHandler_C	\n"
     );
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/

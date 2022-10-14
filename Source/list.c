@@ -44,7 +44,7 @@
 /*-----------------------------------------------------------
 * PUBLIC LIST API documented in list.h
 *----------------------------------------------------------*/
-
+FREERTOS_COMMON_SECTION_BEGIN
 void vListInitialise( List_t * const pxList )
 {
     /* The list structure contains a list item which is used to mark the
@@ -68,8 +68,10 @@ void vListInitialise( List_t * const pxList )
     listSET_LIST_INTEGRITY_CHECK_1_VALUE( pxList );
     listSET_LIST_INTEGRITY_CHECK_2_VALUE( pxList );
 }
-/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_END
 
+/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_BEGIN
 void vListInitialiseItem( ListItem_t * const pxItem )
 {
     /* Make sure the list item is not recorded as being on a list. */
@@ -80,8 +82,9 @@ void vListInitialiseItem( ListItem_t * const pxItem )
     listSET_FIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE( pxItem );
     listSET_SECOND_LIST_ITEM_INTEGRITY_CHECK_VALUE( pxItem );
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
-
+FREERTOS_COMMON_SECTION_BEGIN
 void vListInsertEnd( List_t * const pxList,
                      ListItem_t * const pxNewListItem )
 {
@@ -110,6 +113,7 @@ void vListInsertEnd( List_t * const pxList,
 
     ( pxList->uxNumberOfItems )++;
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 void vListInsert( List_t * const pxList,
@@ -179,7 +183,7 @@ void vListInsert( List_t * const pxList,
     ( pxList->uxNumberOfItems )++;
 }
 /*-----------------------------------------------------------*/
-
+FREERTOS_COMMON_SECTION_BEGIN
 UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
 {
 /* The list item knows which list it is in.  Obtain the list from the list
@@ -207,4 +211,5 @@ UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
 
     return pxList->uxNumberOfItems;
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/

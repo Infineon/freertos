@@ -560,7 +560,6 @@ PRIVILEGED_DATA static volatile uint32_t ulCriticalNesting = 0xaaaaaaaaUL;
 #endif /* configUSE_TICKLESS_IDLE */
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 __attribute__( ( weak ) ) void vPortSetupTimerInterrupt( void ) /* PRIVILEGED_FUNCTION */
 {
     /* Calculate the constants required to configure the tick interrupt. */
@@ -590,11 +589,8 @@ __attribute__( ( weak ) ) void vPortSetupTimerInterrupt( void ) /* PRIVILEGED_FU
     NVIC_SetVector (SysTick_IRQn, (long unsigned int)&SysTick_Handler);
     #endif
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 static void prvTaskExitError( void )
 {
     volatile uint32_t ulDummy = 0UL;
@@ -618,8 +614,6 @@ static void prvTaskExitError( void )
          * appears after it. */
     }
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
 #if ( configENABLE_MPU == 1 )
@@ -733,7 +727,6 @@ FREERTOS_COMMON_SECTION_END
 #endif /* configENABLE_FPU */
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void vPortYield( void ) /* PRIVILEGED_FUNCTION */
 {
     /* Set a PendSV to request a context switch. */
@@ -744,11 +737,8 @@ void vPortYield( void ) /* PRIVILEGED_FUNCTION */
     __asm volatile ( "dsb" ::: "memory" );
     __asm volatile ( "isb" );
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void vPortEnterCritical( void ) /* PRIVILEGED_FUNCTION */
 {
     portDISABLE_INTERRUPTS();
@@ -759,10 +749,8 @@ void vPortEnterCritical( void ) /* PRIVILEGED_FUNCTION */
     __asm volatile ( "dsb" ::: "memory" );
     __asm volatile ( "isb" );
 }
-FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void vPortExitCritical( void ) /* PRIVILEGED_FUNCTION */
 {
     configASSERT( ulCriticalNesting );
@@ -773,11 +761,8 @@ void vPortExitCritical( void ) /* PRIVILEGED_FUNCTION */
         portENABLE_INTERRUPTS();
     }
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void SysTick_Handler( void ) /* PRIVILEGED_FUNCTION */
 {
     uint32_t ulPreviousMask;
@@ -793,8 +778,6 @@ void SysTick_Handler( void ) /* PRIVILEGED_FUNCTION */
     }
     portCLEAR_INTERRUPT_MASK_FROM_ISR( ulPreviousMask );
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
 void vPortSVCHandler_C( uint32_t * pulCallerStackAddress ) /* PRIVILEGED_FUNCTION portDONT_DISCARD */
@@ -1038,7 +1021,6 @@ void vPortSVCHandler_C( uint32_t * pulCallerStackAddress ) /* PRIVILEGED_FUNCTIO
 }
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xPortStartScheduler( void ) /* PRIVILEGED_FUNCTION */
 {
     /* Make PendSV, CallSV and SysTick the same priority as the kernel. */
@@ -1074,8 +1056,6 @@ BaseType_t xPortStartScheduler( void ) /* PRIVILEGED_FUNCTION */
     /* Should not get here. */
     return 0;
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
 void vPortEndScheduler( void ) /* PRIVILEGED_FUNCTION */

@@ -560,7 +560,6 @@ PRIVILEGED_DATA static volatile uint32_t ulCriticalNesting = 0xaaaaaaaaUL;
 #endif /* configUSE_TICKLESS_IDLE */
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 __attribute__( ( weak ) ) void vPortSetupTimerInterrupt( void ) /* PRIVILEGED_FUNCTION */
 {
     /* Calculate the constants required to configure the tick interrupt. */
@@ -579,22 +578,19 @@ __attribute__( ( weak ) ) void vPortSetupTimerInterrupt( void ) /* PRIVILEGED_FU
     /* Configure SysTick to interrupt at the requested rate. */
     portNVIC_SYSTICK_LOAD_REG = ( configSYSTICK_CLOCK_HZ / configTICK_RATE_HZ ) - 1UL;
     portNVIC_SYSTICK_CTRL_REG = portNVIC_SYSTICK_CLK_BIT | portNVIC_SYSTICK_INT_BIT | portNVIC_SYSTICK_ENABLE_BIT;
-
+    
     /* Re-register SysTick_Handler.
      * mtb-pdl-cat1 version 3.0 and higher overwrites Systick handler in Cy_SysTick_Init().
      * So the re-registration is needed when mtb-pdl-cat1 version 3.0 or higher is used.
-     * If lower versions of mtb-pdl-cat1 is used, Systick handler does not get overwritten.
+     * If lower versions of mtb-pdl-cat1 is used, Systick handler does not get overwritten. 
      * Re-registration in this case will cause no harm.
      */
-    #if defined (COMPONENT_CAT1) 
+    #if defined (COMPONENT_CAT1)
     NVIC_SetVector (SysTick_IRQn, (long unsigned int)&SysTick_Handler);
     #endif
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 static void prvTaskExitError( void )
 {
     volatile uint32_t ulDummy = 0UL;
@@ -618,8 +614,6 @@ static void prvTaskExitError( void )
          * appears after it. */
     }
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
 #if ( configENABLE_MPU == 1 )
@@ -733,7 +727,6 @@ FREERTOS_COMMON_SECTION_END
 #endif /* configENABLE_FPU */
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void vPortYield( void ) /* PRIVILEGED_FUNCTION */
 {
     /* Set a PendSV to request a context switch. */
@@ -744,11 +737,8 @@ void vPortYield( void ) /* PRIVILEGED_FUNCTION */
     __asm volatile ( "dsb" ::: "memory" );
     __asm volatile ( "isb" );
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void vPortEnterCritical( void ) /* PRIVILEGED_FUNCTION */
 {
     portDISABLE_INTERRUPTS();
@@ -759,10 +749,8 @@ void vPortEnterCritical( void ) /* PRIVILEGED_FUNCTION */
     __asm volatile ( "dsb" ::: "memory" );
     __asm volatile ( "isb" );
 }
-FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void vPortExitCritical( void ) /* PRIVILEGED_FUNCTION */
 {
     configASSERT( ulCriticalNesting );
@@ -773,11 +761,8 @@ void vPortExitCritical( void ) /* PRIVILEGED_FUNCTION */
         portENABLE_INTERRUPTS();
     }
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 void SysTick_Handler( void ) /* PRIVILEGED_FUNCTION */
 {
     uint32_t ulPreviousMask;
@@ -793,8 +778,6 @@ void SysTick_Handler( void ) /* PRIVILEGED_FUNCTION */
     }
     portCLEAR_INTERRUPT_MASK_FROM_ISR( ulPreviousMask );
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
 void vPortSVCHandler_C( uint32_t * pulCallerStackAddress ) /* PRIVILEGED_FUNCTION portDONT_DISCARD */
@@ -1038,7 +1021,6 @@ void vPortSVCHandler_C( uint32_t * pulCallerStackAddress ) /* PRIVILEGED_FUNCTIO
 }
 /*-----------------------------------------------------------*/
 
-FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xPortStartScheduler( void ) /* PRIVILEGED_FUNCTION */
 {
     /* Make PendSV, CallSV and SysTick the same priority as the kernel. */
@@ -1074,8 +1056,6 @@ BaseType_t xPortStartScheduler( void ) /* PRIVILEGED_FUNCTION */
     /* Should not get here. */
     return 0;
 }
-FREERTOS_COMMON_SECTION_END
-
 /*-----------------------------------------------------------*/
 
 void vPortEndScheduler( void ) /* PRIVILEGED_FUNCTION */
@@ -1237,6 +1217,7 @@ BaseType_t xPortIsInsideInterrupt( void )
 #if configUSE_MALLOC_FAILED_HOOK == 1
     __attribute__((weak)) void vApplicationMallocFailedHook( void )
     {
+        /* The heap space has been exceeded. */
         taskDISABLE_INTERRUPTS();
         CY_ASSERT(0U != 0U);
         for( ;; )
@@ -1250,6 +1231,7 @@ BaseType_t xPortIsInsideInterrupt( void )
     {
         (void)xTask;
         (void)pcTaskName;
+        /* The stack space has been exceeded for a task, considering allocating more. */
         taskDISABLE_INTERRUPTS();
         CY_ASSERT(0U != 0U);
         for( ;; )

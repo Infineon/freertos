@@ -980,6 +980,7 @@ BaseType_t xQueueGenericSend( QueueHandle_t xQueue,
 }
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xQueueGenericSendFromISR( QueueHandle_t xQueue,
                                      const void * const pvItemToQueue,
                                      BaseType_t * const pxHigherPriorityTaskWoken,
@@ -1145,8 +1146,10 @@ BaseType_t xQueueGenericSendFromISR( QueueHandle_t xQueue,
 
     return xReturn;
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xQueueGiveFromISR( QueueHandle_t xQueue,
                               BaseType_t * const pxHigherPriorityTaskWoken )
 {
@@ -1313,8 +1316,10 @@ BaseType_t xQueueGiveFromISR( QueueHandle_t xQueue,
 
     return xReturn;
 }
-/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_END
 
+/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xQueueReceive( QueueHandle_t xQueue,
                           void * const pvBuffer,
                           TickType_t xTicksToWait )
@@ -1456,6 +1461,7 @@ BaseType_t xQueueReceive( QueueHandle_t xQueue,
         }
     } /*lint -restore */
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue,
@@ -2123,6 +2129,7 @@ void vQueueDelete( QueueHandle_t xQueue )
 #endif /* configUSE_MUTEXES */
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 static BaseType_t prvCopyDataToQueue( Queue_t * const pxQueue,
                                       const void * pvItemToQueue,
                                       const BaseType_t xPosition )
@@ -2204,8 +2211,10 @@ static BaseType_t prvCopyDataToQueue( Queue_t * const pxQueue,
 
     return xReturn;
 }
-/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_END
 
+/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_BEGIN
 static void prvCopyDataFromQueue( Queue_t * const pxQueue,
                                   void * const pvBuffer )
 {
@@ -2225,8 +2234,10 @@ static void prvCopyDataFromQueue( Queue_t * const pxQueue,
         ( void ) memcpy( ( void * ) pvBuffer, ( void * ) pxQueue->u.xQueue.pcReadFrom, ( size_t ) pxQueue->uxItemSize ); /*lint !e961 !e418 !e9087 MISRA exception as the casts are only redundant for some ports.  Also previous logic ensures a null pointer can only be passed to memcpy() when the count is 0.  Cast to void required by function signature and safe as no alignment requirement and copy length specified in bytes. */
     }
 }
-/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_END
 
+/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_BEGIN
 static void prvUnlockQueue( Queue_t * const pxQueue )
 {
     /* THIS FUNCTION MUST BE CALLED WITH THE SCHEDULER SUSPENDED. */
@@ -2345,8 +2356,11 @@ static void prvUnlockQueue( Queue_t * const pxQueue )
     }
     taskEXIT_CRITICAL();
 }
+FREERTOS_COMMON_SECTION_END
+
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 static BaseType_t prvIsQueueEmpty( const Queue_t * pxQueue )
 {
     BaseType_t xReturn;
@@ -2366,6 +2380,8 @@ static BaseType_t prvIsQueueEmpty( const Queue_t * pxQueue )
 
     return xReturn;
 }
+FREERTOS_COMMON_SECTION_END
+
 /*-----------------------------------------------------------*/
 
 BaseType_t xQueueIsQueueEmptyFromISR( const QueueHandle_t xQueue )

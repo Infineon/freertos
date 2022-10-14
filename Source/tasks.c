@@ -728,6 +728,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB ) PRIVILEGED_FUNCTION;
 
 #if ( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
 
+FREERTOS_COMMON_SECTION_BEGIN
     BaseType_t xTaskCreate( TaskFunction_t pxTaskCode,
                             const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
                             const configSTACK_DEPTH_TYPE usStackDepth,
@@ -815,6 +816,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB ) PRIVILEGED_FUNCTION;
 
         return xReturn;
     }
+FREERTOS_COMMON_SECTION_END
 
 #endif /* configSUPPORT_DYNAMIC_ALLOCATION */
 /*-----------------------------------------------------------*/
@@ -1069,7 +1071,7 @@ static void prvInitialiseNewTask( TaskFunction_t pxTaskCode,
     }
 }
 /*-----------------------------------------------------------*/
-
+FREERTOS_COMMON_SECTION_BEGIN
 static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
 {
     /* Ensure interrupts don't access the task lists while the lists are being
@@ -1152,6 +1154,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
         mtCOVERAGE_TEST_MARKER();
     }
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 #if ( INCLUDE_vTaskDelete == 1 )
@@ -1345,6 +1348,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
 
 #if ( INCLUDE_vTaskDelay == 1 )
 
+FREERTOS_COMMON_SECTION_BEGIN
     void vTaskDelay( const TickType_t xTicksToDelay )
     {
         BaseType_t xAlreadyYielded = pdFALSE;
@@ -1384,6 +1388,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
             mtCOVERAGE_TEST_MARKER();
         }
     }
+FREERTOS_COMMON_SECTION_END
 
 #endif /* INCLUDE_vTaskDelay */
 /*-----------------------------------------------------------*/
@@ -1714,7 +1719,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
 /*-----------------------------------------------------------*/
 
 #if ( INCLUDE_vTaskSuspend == 1 )
-
+FREERTOS_COMMON_SECTION_BEGIN
     void vTaskSuspend( TaskHandle_t xTaskToSuspend )
     {
         TCB_t * pxTCB;
@@ -1815,6 +1820,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
             mtCOVERAGE_TEST_MARKER();
         }
     }
+FREERTOS_COMMON_SECTION_END
 
 #endif /* INCLUDE_vTaskSuspend */
 /*-----------------------------------------------------------*/
@@ -1995,7 +2001,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
 
 #endif /* ( ( INCLUDE_xTaskResumeFromISR == 1 ) && ( INCLUDE_vTaskSuspend == 1 ) ) */
 /*-----------------------------------------------------------*/
-
+FREERTOS_COMMON_SECTION_BEGIN
 void vTaskStartScheduler( void )
 {
     BaseType_t xReturn;
@@ -2122,6 +2128,7 @@ void vTaskStartScheduler( void )
      * from getting optimized out as it is no longer used by the kernel. */
     ( void ) uxTopUsedPriority;
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 void vTaskEndScheduler( void )
@@ -2157,7 +2164,7 @@ void vTaskSuspendAll( void )
 /*----------------------------------------------------------*/
 
 #if ( configUSE_TICKLESS_IDLE != 0 )
-
+FREERTOS_COMMON_SECTION_BEGIN
     static TickType_t prvGetExpectedIdleTime( void )
     {
         TickType_t xReturn;
@@ -2215,10 +2222,12 @@ void vTaskSuspendAll( void )
 
         return xReturn;
     }
+FREERTOS_COMMON_SECTION_END
 
 #endif /* configUSE_TICKLESS_IDLE */
 /*----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xTaskResumeAll( void )
 {
     TCB_t * pxTCB = NULL;
@@ -2328,6 +2337,7 @@ BaseType_t xTaskResumeAll( void )
 
     return xAlreadyYielded;
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 TickType_t xTaskGetTickCount( void )
@@ -2623,6 +2633,7 @@ char * pcTaskGetName( TaskHandle_t xTaskToQuery ) /*lint !e971 Unqualified char 
  * 1. */
 #if ( configUSE_TICKLESS_IDLE != 0 )
 
+FREERTOS_COMMON_SECTION_BEGIN
     void vTaskStepTick( const TickType_t xTicksToJump )
     {
         /* Correct the tick count value after a period during which the tick
@@ -2632,6 +2643,7 @@ char * pcTaskGetName( TaskHandle_t xTaskToQuery ) /*lint !e971 Unqualified char 
         xTickCount += xTicksToJump;
         traceINCREASE_TICK_COUNT( xTicksToJump );
     }
+FREERTOS_COMMON_SECTION_END
 
 #endif /* configUSE_TICKLESS_IDLE */
 /*----------------------------------------------------------*/
@@ -2734,6 +2746,7 @@ BaseType_t xTaskCatchUpTicks( TickType_t xTicksToCatchUp )
 #endif /* INCLUDE_xTaskAbortDelay */
 /*----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xTaskIncrementTick( void )
 {
     TCB_t * pxTCB;
@@ -2905,6 +2918,7 @@ BaseType_t xTaskIncrementTick( void )
 
     return xSwitchRequired;
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 #if ( configUSE_APPLICATION_TASK_TAG == 1 )
@@ -3019,6 +3033,7 @@ BaseType_t xTaskIncrementTick( void )
 #endif /* configUSE_APPLICATION_TASK_TAG */
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 void vTaskSwitchContext( void )
 {
     if( uxSchedulerSuspended != ( UBaseType_t ) pdFALSE )
@@ -3093,6 +3108,7 @@ void vTaskSwitchContext( void )
         #endif /* configUSE_NEWLIB_REENTRANT */
     }
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 void vTaskPlaceOnEventList( List_t * const pxEventList,
@@ -3113,6 +3129,7 @@ void vTaskPlaceOnEventList( List_t * const pxEventList,
 }
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 void vTaskPlaceOnUnorderedEventList( List_t * pxEventList,
                                      const TickType_t xItemValue,
                                      const TickType_t xTicksToWait )
@@ -3137,10 +3154,12 @@ void vTaskPlaceOnUnorderedEventList( List_t * pxEventList,
 
     prvAddCurrentTaskToDelayedList( xTicksToWait, pdTRUE );
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 #if ( configUSE_TIMERS == 1 )
 
+FREERTOS_COMMON_SECTION_BEGIN
     void vTaskPlaceOnEventListRestricted( List_t * const pxEventList,
                                           TickType_t xTicksToWait,
                                           const BaseType_t xWaitIndefinitely )
@@ -3170,10 +3189,12 @@ void vTaskPlaceOnUnorderedEventList( List_t * pxEventList,
         traceTASK_DELAY_UNTIL( ( xTickCount + xTicksToWait ) );
         prvAddCurrentTaskToDelayedList( xTicksToWait, xWaitIndefinitely );
     }
+FREERTOS_COMMON_SECTION_END
 
 #endif /* configUSE_TIMERS */
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xTaskRemoveFromEventList( const List_t * const pxEventList )
 {
     TCB_t * pxUnblockedTCB;
@@ -3240,8 +3261,10 @@ BaseType_t xTaskRemoveFromEventList( const List_t * const pxEventList )
 
     return xReturn;
 }
-/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_END
 
+/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_BEGIN
 void vTaskRemoveFromUnorderedEventList( ListItem_t * pxEventListItem,
                                         const TickType_t xItemValue )
 {
@@ -3289,6 +3312,8 @@ void vTaskRemoveFromUnorderedEventList( ListItem_t * pxEventListItem,
         xYieldPending = pdTRUE;
     }
 }
+FREERTOS_COMMON_SECTION_END
+
 /*-----------------------------------------------------------*/
 
 void vTaskSetTimeOutState( TimeOut_t * const pxTimeOut )
@@ -3310,7 +3335,7 @@ void vTaskInternalSetTimeOutState( TimeOut_t * const pxTimeOut )
     pxTimeOut->xTimeOnEntering = xTickCount;
 }
 /*-----------------------------------------------------------*/
-
+FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xTaskCheckForTimeOut( TimeOut_t * const pxTimeOut,
                                  TickType_t * const pxTicksToWait )
 {
@@ -3374,12 +3399,16 @@ BaseType_t xTaskCheckForTimeOut( TimeOut_t * const pxTimeOut,
 
     return xReturn;
 }
-/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_END
 
+/*-----------------------------------------------------------*/
+FREERTOS_COMMON_SECTION_BEGIN
 void vTaskMissedYield( void )
 {
     xYieldPending = pdTRUE;
 }
+FREERTOS_COMMON_SECTION_END
+
 /*-----------------------------------------------------------*/
 
 #if ( configUSE_TRACE_FACILITY == 1 )
@@ -3432,6 +3461,7 @@ void vTaskMissedYield( void )
  * void prvIdleTask( void *pvParameters );
  *
  */
+FREERTOS_COMMON_SECTION_BEGIN
 static portTASK_FUNCTION( prvIdleTask, pvParameters )
 {
     /* Stop warnings. */
@@ -3547,10 +3577,11 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
         #endif /* configUSE_TICKLESS_IDLE */
     }
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 #if ( configUSE_TICKLESS_IDLE != 0 )
-
+FREERTOS_COMMON_SECTION_BEGIN
     eSleepModeStatus eTaskConfirmSleepModeStatus( void )
     {
         /* The idle task exists in addition to the application tasks. */
@@ -3593,6 +3624,7 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 
         return eReturn;
     }
+FREERTOS_COMMON_SECTION_END
 
 #endif /* configUSE_TICKLESS_IDLE */
 /*-----------------------------------------------------------*/
@@ -3996,7 +4028,7 @@ static void prvCheckTasksWaitingTermination( void )
 
 #endif /* INCLUDE_vTaskDelete */
 /*-----------------------------------------------------------*/
-
+FREERTOS_COMMON_SECTION_BEGIN
 static void prvResetNextTaskUnblockTime( void )
 {
     if( listLIST_IS_EMPTY( pxDelayedTaskList ) != pdFALSE )
@@ -4016,10 +4048,11 @@ static void prvResetNextTaskUnblockTime( void )
         xNextTaskUnblockTime = listGET_ITEM_VALUE_OF_HEAD_ENTRY( pxDelayedTaskList );
     }
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 #if ( ( INCLUDE_xTaskGetCurrentTaskHandle == 1 ) || ( configUSE_MUTEXES == 1 ) )
-
+FREERTOS_COMMON_SECTION_BEGIN
     TaskHandle_t xTaskGetCurrentTaskHandle( void )
     {
         TaskHandle_t xReturn;
@@ -4031,12 +4064,13 @@ static void prvResetNextTaskUnblockTime( void )
 
         return xReturn;
     }
+FREERTOS_COMMON_SECTION_END
 
 #endif /* ( ( INCLUDE_xTaskGetCurrentTaskHandle == 1 ) || ( configUSE_MUTEXES == 1 ) ) */
 /*-----------------------------------------------------------*/
 
 #if ( ( INCLUDE_xTaskGetSchedulerState == 1 ) || ( configUSE_TIMERS == 1 ) )
-
+FREERTOS_COMMON_SECTION_BEGIN
     BaseType_t xTaskGetSchedulerState( void )
     {
         BaseType_t xReturn;
@@ -4059,6 +4093,7 @@ static void prvResetNextTaskUnblockTime( void )
 
         return xReturn;
     }
+FREERTOS_COMMON_SECTION_END
 
 #endif /* ( ( INCLUDE_xTaskGetSchedulerState == 1 ) || ( configUSE_TIMERS == 1 ) ) */
 /*-----------------------------------------------------------*/
@@ -5271,7 +5306,7 @@ TickType_t uxTaskResetEventItemValue( void )
 
 #endif
 /*-----------------------------------------------------------*/
-
+FREERTOS_COMMON_SECTION_BEGIN
 static void prvAddCurrentTaskToDelayedList( TickType_t xTicksToWait,
                                             const BaseType_t xCanBlockIndefinitely )
 {
@@ -5383,6 +5418,7 @@ static void prvAddCurrentTaskToDelayedList( TickType_t xTicksToWait,
         }
     #endif /* INCLUDE_vTaskSuspend */
 }
+FREERTOS_COMMON_SECTION_END
 
 /* Code below here allows additional code to be inserted into this source file,
  * especially where access to file scope functions and data is needed (for example

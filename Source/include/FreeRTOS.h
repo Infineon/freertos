@@ -72,6 +72,36 @@
     #include <reent.h>
 #endif
 
+/** Define start of the function placed to the SRAM area by the linker */
+#if defined(__ARMCC_VERSION)
+/** To create cross compiler compatible code, use the CY_NOINIT, CY_SECTION, CY_UNUSED, CY_ALIGN
+     * attributes at the first place of declaration/definition.
+     * For example: CY_NOINIT uint32_t noinitVar;
+     */
+#define FREERTOS_COMMON_SECTION_BEGIN __attribute__((section(".text.cy_os_common")))
+#define FREERTOS_COMMON_SECTION_END
+
+#elif defined(__ICCARM__)
+
+#define FREERTOS_COMMON_SECTION_BEGIN _Pragma("default_function_attributes = @\".text.cy_os_common\"")
+#define FREERTOS_COMMON_SECTION_END _Pragma("default_function_attributes = ")
+
+#elif defined(__GNUC__)
+#if defined(__clang__)
+#define FREERTOS_COMMON_SECTION_BEGIN __attribute__((section("__DATA, .text.cy_os_common")))
+#define FREERTOS_COMMON_SECTION_END
+
+#else
+#define FREERTOS_COMMON_SECTION_BEGIN __attribute__((section(".text.cy_os_common")))
+#define FREERTOS_COMMON_SECTION_END
+
+#endif
+#else // if defined(__ARMCC_VERSION)
+#define FREERTOS_COMMON_SECTION_BEGIN
+#define FREERTOS_COMMON_SECTION_END
+
+#endif // (__ARMCC_VERSION)
+
 /*
  * Check all the required application specific macros have been defined.
  * These macros are application specific and (as downloaded) are defined
