@@ -613,6 +613,7 @@ static void prvInitialiseNewQueue( const UBaseType_t uxQueueLength,
 
 #if ( configUSE_RECURSIVE_MUTEXES == 1 )
 
+    FREERTOS_COMMON_SECTION_BEGIN
     BaseType_t xQueueGiveMutexRecursive( QueueHandle_t xMutex )
     {
         BaseType_t xReturn;
@@ -662,12 +663,14 @@ static void prvInitialiseNewQueue( const UBaseType_t uxQueueLength,
 
         return xReturn;
     }
+    FREERTOS_COMMON_SECTION_END
 
 #endif /* configUSE_RECURSIVE_MUTEXES */
 /*-----------------------------------------------------------*/
 
 #if ( configUSE_RECURSIVE_MUTEXES == 1 )
 
+    FREERTOS_COMMON_SECTION_BEGIN
     BaseType_t xQueueTakeMutexRecursive( QueueHandle_t xMutex,
                                          TickType_t xTicksToWait )
     {
@@ -705,6 +708,7 @@ static void prvInitialiseNewQueue( const UBaseType_t uxQueueLength,
 
         return xReturn;
     }
+    FREERTOS_COMMON_SECTION_END
 
 #endif /* configUSE_RECURSIVE_MUTEXES */
 /*-----------------------------------------------------------*/
@@ -768,6 +772,7 @@ static void prvInitialiseNewQueue( const UBaseType_t uxQueueLength,
 #endif /* ( ( configUSE_COUNTING_SEMAPHORES == 1 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) ) */
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xQueueGenericSend( QueueHandle_t xQueue,
                               const void * const pvItemToQueue,
                               TickType_t xTicksToWait,
@@ -978,6 +983,7 @@ BaseType_t xQueueGenericSend( QueueHandle_t xQueue,
         }
     } /*lint -restore */
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 FREERTOS_COMMON_SECTION_BEGIN
@@ -1464,6 +1470,7 @@ BaseType_t xQueueReceive( QueueHandle_t xQueue,
 FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue,
                                 TickType_t xTicksToWait )
 {
@@ -1681,6 +1688,7 @@ BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue,
         }
     } /*lint -restore */
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 BaseType_t xQueuePeek( QueueHandle_t xQueue,
@@ -1984,6 +1992,7 @@ BaseType_t xQueuePeekFromISR( QueueHandle_t xQueue,
 }
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 UBaseType_t uxQueueMessagesWaiting( const QueueHandle_t xQueue )
 {
     UBaseType_t uxReturn;
@@ -1998,6 +2007,7 @@ UBaseType_t uxQueueMessagesWaiting( const QueueHandle_t xQueue )
 
     return uxReturn;
 } /*lint !e818 Pointer cannot be declared const as xQueue is a typedef not pointer. */
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 UBaseType_t uxQueueSpacesAvailable( const QueueHandle_t xQueue )
@@ -2404,6 +2414,7 @@ BaseType_t xQueueIsQueueEmptyFromISR( const QueueHandle_t xQueue )
 } /*lint !e818 xQueue could not be pointer to const because it is a typedef. */
 /*-----------------------------------------------------------*/
 
+FREERTOS_COMMON_SECTION_BEGIN
 static BaseType_t prvIsQueueFull( const Queue_t * pxQueue )
 {
     BaseType_t xReturn;
@@ -2423,6 +2434,7 @@ static BaseType_t prvIsQueueFull( const Queue_t * pxQueue )
 
     return xReturn;
 }
+FREERTOS_COMMON_SECTION_END
 /*-----------------------------------------------------------*/
 
 BaseType_t xQueueIsQueueFullFromISR( const QueueHandle_t xQueue )
@@ -2823,7 +2835,7 @@ BaseType_t xQueueIsQueueFullFromISR( const QueueHandle_t xQueue )
 /*-----------------------------------------------------------*/
 
 #if ( configUSE_TIMERS == 1 )
-
+    FREERTOS_COMMON_SECTION_BEGIN
     void vQueueWaitForMessageRestricted( QueueHandle_t xQueue,
                                          TickType_t xTicksToWait,
                                          const BaseType_t xWaitIndefinitely )
@@ -2858,6 +2870,7 @@ BaseType_t xQueueIsQueueFullFromISR( const QueueHandle_t xQueue )
 
         prvUnlockQueue( pxQueue );
     }
+    FREERTOS_COMMON_SECTION_END
 
 #endif /* configUSE_TIMERS */
 /*-----------------------------------------------------------*/

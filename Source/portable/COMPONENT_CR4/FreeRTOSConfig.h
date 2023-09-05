@@ -195,4 +195,7 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
  */
 #define configUSE_NEWLIB_REENTRANT              1
 
+/* To enable debugging in CR4, return address of task should be set to zero */
+#define configTASK_RETURN_ADDRESS               0
+
 #endif /* FREERTOS_CONFIG_H */

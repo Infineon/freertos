@@ -6,6 +6,8 @@ FreeRTOS is supplied as standard C source files built along with the other C fil
 
 **Note:** Cortex&reg;-R4 (CR4) is currently supported only on GCC_ARM
 
+**Note:** Currently only GCC_ARM and ARM compilers are supported On CYW920829M2EVK-02 (20829B0 CM33) kit
+
 See the FreeRTOS API documentation at <a href="https://www.freertos.org/a00106.html" target="_blank">FreeRTOS web page</a>.
 
 ## Features
@@ -211,7 +213,7 @@ This parameter specifies the total amount of RAM available for the FreRTOS heap.
 
 ### `configMINIMAL_STACK_SIZE`
 
-This parameter specifies the size of the stack used by the idle task. It is not recommended to reduce the default parameter value.
+This parameter specifies the size of the stack used by the idle task. It is not recommended to reduce the default parameter value. Please note that when DS-RAM feature is enabled, the minimum value of this parameter should be 256.
 
 
 ### `configUSE_TICKLESS_IDLE`
