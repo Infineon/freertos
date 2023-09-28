@@ -1,6 +1,8 @@
 /*
- * FreeRTOS Kernel V10.4.3 LTS Patch 2
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.5.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
  * Copyright (C) 2019-2020 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
@@ -316,7 +318,7 @@ BaseType_t xPortStartScheduler( void )
              * value. */
             *pucFirstUserPriorityRegister = ulOriginalPriority;
         }
-    #endif /* conifgASSERT_DEFINED */
+    #endif /* configASSERT_DEFINED */
 
     /* Make PendSV and SysTick the lowest priority interrupts. */
     portNVIC_SHPR3_REG |= portNVIC_PENDSV_PRI;

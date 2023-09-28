@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.4.3 LTS Patch 2
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.5.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2019-2021 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
@@ -81,7 +81,11 @@ extern uint32_t SystemCoreClock;
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 
 /* Compile-time macros to enable or disable TrustZone, Memory Protection Unit (MPU) and Floating Point Unit (FPU) support. */
+#if defined (CY_DEVICE_CAT1D) 
+#define configENABLE_FPU                        1
+#else
 #define configENABLE_FPU                        0
+#endif
 #define configENABLE_MPU                        0
 #define configENABLE_TRUSTZONE                  0
 #define configRUN_FREERTOS_SECURE_ONLY          0
@@ -122,7 +126,11 @@ interrupt safe FreeRTOS API functions can be called.
 !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html
 */
+#if defined (CY_DEVICE_CAT1D) 
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x40
+#else
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x3F
+#endif
 
 /* configMAX_API_CALL_INTERRUPT_PRIORITY is a new name for configMAX_SYSCALL_INTERRUPT_PRIORITY
  that is used by newer ports only. The two are equivalent. */

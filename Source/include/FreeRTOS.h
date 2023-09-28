@@ -1,6 +1,8 @@
 /*
- * FreeRTOS Kernel V10.4.3 LTS Patch 2
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.5.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -45,7 +47,7 @@
  *     contains the typedefs required to build FreeRTOS.  Read the instructions
  *     in FreeRTOS/source/stdint.readme for more information.
  */
-#include <stdint.h>     /* READ COMMENT ABOVE. */
+#include <stdint.h> /* READ COMMENT ABOVE. */
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
@@ -69,8 +71,59 @@
 
 /* Required if struct _reent is used. */
 #if ( configUSE_NEWLIB_REENTRANT == 1 )
+
+/* Note Newlib support has been included by popular demand, but is not
+ * used by the FreeRTOS maintainers themselves.  FreeRTOS is not
+ * responsible for resulting newlib operation.  User must be familiar with
+ * newlib and must provide system-wide implementations of the necessary
+ * stubs. Be warned that (at the time of writing) the current newlib design
+ * implements a system-wide malloc() that must be provided with locks.
+ *
+ * See the third party link http://www.nadler.com/embedded/newlibAndFreeRTOS.html
+ * for additional information. */
     #include <reent.h>
+
+    #define configUSE_C_RUNTIME_TLS_SUPPORT    1
+
+    #ifndef configTLS_BLOCK_TYPE
+        #define configTLS_BLOCK_TYPE           struct _reent
+    #endif
+
+    #ifndef configINIT_TLS_BLOCK
+        #define configINIT_TLS_BLOCK( xTLSBlock )    _REENT_INIT_PTR( &( xTLSBlock ) )
+    #endif
+
+    #ifndef configSET_TLS_BLOCK
+        #define configSET_TLS_BLOCK( xTLSBlock )    _impure_ptr = &( xTLSBlock )
+    #endif
+
+    #ifndef configDEINIT_TLS_BLOCK
+        #define configDEINIT_TLS_BLOCK( xTLSBlock )    _reclaim_reent( &( xTLSBlock ) )
+    #endif
+#endif /* if ( configUSE_NEWLIB_REENTRANT == 1 ) */
+
+#ifndef configUSE_C_RUNTIME_TLS_SUPPORT
+    #define configUSE_C_RUNTIME_TLS_SUPPORT    0
 #endif
+
+#if ( ( configUSE_NEWLIB_REENTRANT == 0 ) && ( configUSE_C_RUNTIME_TLS_SUPPORT == 1 ) )
+
+    #ifndef configTLS_BLOCK_TYPE
+        #error Missing definition:  configTLS_BLOCK_TYPE must be defined in FreeRTOSConfig.h when configUSE_C_RUNTIME_TLS_SUPPORT is set to 1.
+    #endif
+
+    #ifndef configINIT_TLS_BLOCK
+        #error Missing definition:  configINIT_TLS_BLOCK must be defined in FreeRTOSConfig.h when configUSE_C_RUNTIME_TLS_SUPPORT is set to 1.
+    #endif
+
+    #ifndef configSET_TLS_BLOCK
+        #error Missing definition:  configSET_TLS_BLOCK must be defined in FreeRTOSConfig.h when configUSE_C_RUNTIME_TLS_SUPPORT is set to 1.
+    #endif
+
+    #ifndef configDEINIT_TLS_BLOCK
+        #error Missing definition:  configDEINIT_TLS_BLOCK must be defined in FreeRTOSConfig.h when configUSE_C_RUNTIME_TLS_SUPPORT is set to 1.
+    #endif
+#endif /* if ( ( configUSE_NEWLIB_REENTRANT == 0 ) && ( configUSE_C_RUNTIME_TLS_SUPPORT == 1 ) ) */
 
 /** Define start of the function placed to the SRAM area by the linker */
 #if defined(__ARMCC_VERSION)
@@ -158,21 +211,23 @@
 
 #ifdef INCLUDE_xTaskDelayUntil
     #ifdef INCLUDE_vTaskDelayUntil
-        /* INCLUDE_vTaskDelayUntil was replaced by INCLUDE_xTaskDelayUntil.  Backward
-         * compatibility is maintained if only one or the other is defined, but
-         * there is a conflict if both are defined. */
+
+/* INCLUDE_vTaskDelayUntil was replaced by INCLUDE_xTaskDelayUntil.  Backward
+ * compatibility is maintained if only one or the other is defined, but
+ * there is a conflict if both are defined. */
         #error INCLUDE_vTaskDelayUntil and INCLUDE_xTaskDelayUntil are both defined.  INCLUDE_vTaskDelayUntil is no longer required and should be removed
     #endif
 #endif
 
 #ifndef INCLUDE_xTaskDelayUntil
     #ifdef INCLUDE_vTaskDelayUntil
-        /* If INCLUDE_vTaskDelayUntil is set but INCLUDE_xTaskDelayUntil is not then
-         * the project's FreeRTOSConfig.h probably pre-dates the introduction of
-         * xTaskDelayUntil and setting INCLUDE_xTaskDelayUntil to whatever
-         * INCLUDE_vTaskDelayUntil is set to will ensure backward compatibility.
-         */
-        #define INCLUDE_xTaskDelayUntil INCLUDE_vTaskDelayUntil
+
+/* If INCLUDE_vTaskDelayUntil is set but INCLUDE_xTaskDelayUntil is not then
+ * the project's FreeRTOSConfig.h probably pre-dates the introduction of
+ * xTaskDelayUntil and setting INCLUDE_xTaskDelayUntil to whatever
+ * INCLUDE_vTaskDelayUntil is set to will ensure backward compatibility.
+ */
+        #define INCLUDE_xTaskDelayUntil    INCLUDE_vTaskDelayUntil
     #endif
 #endif
 
@@ -229,7 +284,7 @@
 #endif
 
 #ifndef INCLUDE_xTaskGetCurrentTaskHandle
-    #define INCLUDE_xTaskGetCurrentTaskHandle    0
+    #define INCLUDE_xTaskGetCurrentTaskHandle    1
 #endif
 
 #if configUSE_CO_ROUTINES != 0
@@ -335,11 +390,11 @@
 #endif
 
 #ifndef portCLEAR_INTERRUPT_MASK_FROM_ISR
-    #define portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedStatusValue )    ( void ) uxSavedStatusValue
+    #define portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedStatusValue )    ( void ) ( uxSavedStatusValue )
 #endif
 
 #ifndef portCLEAN_UP_TCB
-    #define portCLEAN_UP_TCB( pxTCB )    ( void ) pxTCB
+    #define portCLEAN_UP_TCB( pxTCB )    ( void ) ( pxTCB )
 #endif
 
 #ifndef portPRE_TASK_DELETE_HOOK
@@ -347,7 +402,7 @@
 #endif
 
 #ifndef portSETUP_TCB
-    #define portSETUP_TCB( pxTCB )    ( void ) pxTCB
+    #define portSETUP_TCB( pxTCB )    ( void ) ( pxTCB )
 #endif
 
 #ifndef configQUEUE_REGISTRY_SIZE
@@ -358,6 +413,10 @@
     #define vQueueAddToRegistry( xQueue, pcName )
     #define vQueueUnregisterQueue( xQueue )
     #define pcQueueGetName( xQueue )
+#endif
+
+#ifndef configUSE_MINI_LIST_ITEM
+    #define configUSE_MINI_LIST_ITEM    1
 #endif
 
 #ifndef portPOINTER_SIZE_TYPE
@@ -655,7 +714,7 @@
 #endif
 
 #ifndef traceEVENT_GROUP_SYNC_END
-    #define traceEVENT_GROUP_SYNC_END( xEventGroup, uxBitsToSet, uxBitsToWaitFor, xTimeoutOccurred )    ( void ) xTimeoutOccurred
+    #define traceEVENT_GROUP_SYNC_END( xEventGroup, uxBitsToSet, uxBitsToWaitFor, xTimeoutOccurred )    ( void ) ( xTimeoutOccurred )
 #endif
 
 #ifndef traceEVENT_GROUP_WAIT_BITS_BLOCK
@@ -663,7 +722,7 @@
 #endif
 
 #ifndef traceEVENT_GROUP_WAIT_BITS_END
-    #define traceEVENT_GROUP_WAIT_BITS_END( xEventGroup, uxBitsToWaitFor, xTimeoutOccurred )    ( void ) xTimeoutOccurred
+    #define traceEVENT_GROUP_WAIT_BITS_END( xEventGroup, uxBitsToWaitFor, xTimeoutOccurred )    ( void ) ( xTimeoutOccurred )
 #endif
 
 #ifndef traceEVENT_GROUP_CLEAR_BITS
@@ -912,6 +971,12 @@
     #define configUSE_POSIX_ERRNO    0
 #endif
 
+#ifndef configUSE_SB_COMPLETED_CALLBACK
+
+/* By default per-instance callbacks are not enabled for stream buffer or message buffer. */
+    #define configUSE_SB_COMPLETED_CALLBACK    0
+#endif
+
 #ifndef portTICK_TYPE_IS_ATOMIC
     #define portTICK_TYPE_IS_ATOMIC    0
 #endif
@@ -926,11 +991,29 @@
     #define configSUPPORT_DYNAMIC_ALLOCATION    1
 #endif
 
+#if ( ( configUSE_STATS_FORMATTING_FUNCTIONS > 0 ) && ( configSUPPORT_DYNAMIC_ALLOCATION != 1 ) )
+    #error configUSE_STATS_FORMATTING_FUNCTIONS cannot be used without dynamic allocation, but configSUPPORT_DYNAMIC_ALLOCATION is not set to 1.
+#endif
+
+#if ( configUSE_STATS_FORMATTING_FUNCTIONS > 0 )
+    #if ( ( configUSE_TRACE_FACILITY != 1 ) && ( configGENERATE_RUN_TIME_STATS != 1 ) )
+        #error configUSE_STATS_FORMATTING_FUNCTIONS is 1 but the functions it enables are not used because neither configUSE_TRACE_FACILITY or configGENERATE_RUN_TIME_STATS are 1.  Set configUSE_STATS_FORMATTING_FUNCTIONS to 0 in FreeRTOSConfig.h.
+    #endif
+#endif
+
 #ifndef configSTACK_DEPTH_TYPE
 
 /* Defaults to uint16_t for backward compatibility, but can be overridden
  * in FreeRTOSConfig.h if uint16_t is too restrictive. */
     #define configSTACK_DEPTH_TYPE    uint16_t
+#endif
+
+#ifndef configRUN_TIME_COUNTER_TYPE
+
+/* Defaults to uint32_t for backward compatibility, but can be overridden in
+ * FreeRTOSConfig.h if uint32_t is too restrictive. */
+
+    #define configRUN_TIME_COUNTER_TYPE    uint32_t
 #endif
 
 #ifndef configMESSAGE_BUFFER_LENGTH_TYPE
@@ -942,12 +1025,6 @@
 #endif
 
 /* Sanity check the configuration. */
-#if ( configUSE_TICKLESS_IDLE != 0 )
-    #if ( INCLUDE_vTaskSuspend != 1 )
-        #error INCLUDE_vTaskSuspend must be set to 1 if configUSE_TICKLESS_IDLE is not set to 0
-    #endif /* INCLUDE_vTaskSuspend */
-#endif /* configUSE_TICKLESS_IDLE */
-
 #if ( ( configSUPPORT_STATIC_ALLOCATION == 0 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 0 ) )
     #error configSUPPORT_STATIC_ALLOCATION and configSUPPORT_DYNAMIC_ALLOCATION cannot both be 0, but can both be 1.
 #endif
@@ -976,7 +1053,7 @@
     #define portTICK_TYPE_ENTER_CRITICAL()
     #define portTICK_TYPE_EXIT_CRITICAL()
     #define portTICK_TYPE_SET_INTERRUPT_MASK_FROM_ISR()         0
-    #define portTICK_TYPE_CLEAR_INTERRUPT_MASK_FROM_ISR( x )    ( void ) x
+    #define portTICK_TYPE_CLEAR_INTERRUPT_MASK_FROM_ISR( x )    ( void ) ( x )
 #endif /* if ( portTICK_TYPE_IS_ATOMIC == 0 ) */
 
 /* Definitions to allow backward compatibility with FreeRTOS versions prior to
@@ -1009,7 +1086,7 @@
 
 #ifndef configMIN
 
-/* The application writer has not provided their own MAX macro, so define
+/* The application writer has not provided their own MIN macro, so define
  * the following generic implementation. */
     #define configMIN( a, b )    ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
 #endif
@@ -1072,6 +1149,12 @@
     #define configENABLE_FPU    1
 #endif
 
+/* Set configENABLE_MVE to 1 to enable MVE support and 0 to disable it. This is
+ * currently used in ARMv8M ports. */
+#ifndef configENABLE_MVE
+    #define configENABLE_MVE    0
+#endif
+
 /* Set configENABLE_TRUSTZONE to 1 enable TrustZone support and 0 to disable it.
  * This is currently used in ARMv8M ports. */
 #ifndef configENABLE_TRUSTZONE
@@ -1083,6 +1166,11 @@
 #ifndef configRUN_FREERTOS_SECURE_ONLY
     #define configRUN_FREERTOS_SECURE_ONLY    0
 #endif
+
+#ifndef configRUN_ADDITIONAL_TESTS
+    #define configRUN_ADDITIONAL_TESTS    0
+#endif
+
 
 /* Sometimes the FreeRTOSConfig.h settings only allow a task to be created using
  * dynamically allocated RAM, in which case when any task is deleted it is known
@@ -1135,7 +1223,7 @@
  * data hiding policy, so the real structures used by FreeRTOS to maintain the
  * state of tasks, queues, semaphores, etc. are not accessible to the application
  * code.  However, if the application writer wants to statically allocate such
- * an object then the size of the object needs to be know.  Dummy structures
+ * an object then the size of the object needs to be known.  Dummy structures
  * that are guaranteed to have the same size and alignment requirements of the
  * real objects are used for this purpose.  The dummy list and list item
  * structures below are used for inclusion in such a dummy structure.
@@ -1153,16 +1241,20 @@ struct xSTATIC_LIST_ITEM
 };
 typedef struct xSTATIC_LIST_ITEM StaticListItem_t;
 
-/* See the comments above the struct xSTATIC_LIST_ITEM definition. */
-struct xSTATIC_MINI_LIST_ITEM
-{
-    #if ( configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES == 1 )
-        TickType_t xDummy1;
-    #endif
-    TickType_t xDummy2;
-    void * pvDummy3[ 2 ];
-};
-typedef struct xSTATIC_MINI_LIST_ITEM StaticMiniListItem_t;
+#if ( configUSE_MINI_LIST_ITEM == 1 )
+    /* See the comments above the struct xSTATIC_LIST_ITEM definition. */
+    struct xSTATIC_MINI_LIST_ITEM
+    {
+        #if ( configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES == 1 )
+            TickType_t xDummy1;
+        #endif
+        TickType_t xDummy2;
+        void * pvDummy3[ 2 ];
+    };
+    typedef struct xSTATIC_MINI_LIST_ITEM StaticMiniListItem_t;
+#else /* if ( configUSE_MINI_LIST_ITEM == 1 ) */
+    typedef struct xSTATIC_LIST_ITEM      StaticMiniListItem_t;
+#endif /* if ( configUSE_MINI_LIST_ITEM == 1 ) */
 
 /* See the comments above the struct xSTATIC_LIST_ITEM definition. */
 typedef struct xSTATIC_LIST
@@ -1184,7 +1276,7 @@ typedef struct xSTATIC_LIST
  * strict data hiding policy.  This means the Task structure used internally by
  * FreeRTOS is not accessible to application code.  However, if the application
  * writer wants to statically allocate the memory required to create a task then
- * the size of the task object needs to be know.  The StaticTask_t structure
+ * the size of the task object needs to be known.  The StaticTask_t structure
  * below is provided for this purpose.  Its sizes and alignment requirements are
  * guaranteed to match those of the genuine structure, no matter which
  * architecture is being used, and no matter how the values in FreeRTOSConfig.h
@@ -1220,10 +1312,10 @@ typedef struct xSTATIC_TCB
         void * pvDummy15[ configNUM_THREAD_LOCAL_STORAGE_POINTERS ];
     #endif
     #if ( configGENERATE_RUN_TIME_STATS == 1 )
-        uint32_t ulDummy16;
+        configRUN_TIME_COUNTER_TYPE ulDummy16;
     #endif
-    #if ( configUSE_NEWLIB_REENTRANT == 1 )
-        struct  _reent xDummy17;
+    #if ( ( configUSE_NEWLIB_REENTRANT == 1 ) || ( configUSE_C_RUNTIME_TLS_SUPPORT == 1 ) )
+        configTLS_BLOCK_TYPE xDummy17;
     #endif
     #if ( configUSE_TASK_NOTIFICATIONS == 1 )
         uint32_t ulDummy18[ configTASK_NOTIFICATION_ARRAY_ENTRIES ];
@@ -1247,7 +1339,7 @@ typedef struct xSTATIC_TCB
  * strict data hiding policy.  This means the Queue structure used internally by
  * FreeRTOS is not accessible to application code.  However, if the application
  * writer wants to statically allocate the memory required to create a queue
- * then the size of the queue object needs to be know.  The StaticQueue_t
+ * then the size of the queue object needs to be known.  The StaticQueue_t
  * structure below is provided for this purpose.  Its sizes and alignment
  * requirements are guaranteed to match those of the genuine structure, no
  * matter which architecture is being used, and no matter how the values in
@@ -1318,7 +1410,7 @@ typedef struct xSTATIC_EVENT_GROUP
  * strict data hiding policy.  This means the software timer structure used
  * internally by FreeRTOS is not accessible to application code.  However, if
  * the application writer wants to statically allocate the memory required to
- * create a software timer then the size of the queue object needs to be know.
+ * create a software timer then the size of the queue object needs to be known.
  * The StaticTimer_t structure below is provided for this purpose.  Its sizes
  * and alignment requirements are guaranteed to match those of the genuine
  * structure, no matter which architecture is being used, and no matter how the
@@ -1346,12 +1438,12 @@ typedef struct xSTATIC_TIMER
  * internally by FreeRTOS is not accessible to application code.  However, if
  * the application writer wants to statically allocate the memory required to
  * create a stream buffer then the size of the stream buffer object needs to be
- * know.  The StaticStreamBuffer_t structure below is provided for this purpose.
- * Its size and alignment requirements are guaranteed to match those of the
- * genuine structure, no matter which architecture is being used, and no matter
- * how the values in FreeRTOSConfig.h are set.  Its contents are somewhat
- * obfuscated in the hope users will recognise that it would be unwise to make
- * direct use of the structure members.
+ * known.  The StaticStreamBuffer_t structure below is provided for this
+ * purpose.  Its size and alignment requirements are guaranteed to match those
+ * of the genuine structure, no matter which architecture is being used, and
+ * no matter how the values in FreeRTOSConfig.h are set.  Its contents are
+ * somewhat obfuscated in the hope users will recognise that it would be unwise
+ * to make direct use of the structure members.
  */
 typedef struct xSTATIC_STREAM_BUFFER
 {
@@ -1360,6 +1452,9 @@ typedef struct xSTATIC_STREAM_BUFFER
     uint8_t ucDummy3;
     #if ( configUSE_TRACE_FACILITY == 1 )
         UBaseType_t uxDummy4;
+    #endif
+    #if ( configUSE_SB_COMPLETED_CALLBACK == 1 )
+        void * pvDummy5[ 2 ];
     #endif
 } StaticStreamBuffer_t;
 

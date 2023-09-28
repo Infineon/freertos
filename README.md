@@ -142,6 +142,7 @@ The following configuration values are especially important to CM0, CM0P, CM4, C
 - [`configMINIMAL_STACK_SIZE`](#configminimal_stack_size)
 - [`configUSE_TICKLESS_IDLE`](#configuse_tickless_idle)
 - [`configUSE_NEWLIB_REENTRANT`](#configuse_newlib_reentrant)
+- [`configMAX_PRIORITIES`](#configmax_priorities)
 
 
 ### `configCPU_CLOCK_HZ`
@@ -247,6 +248,17 @@ See the following resources for more details on newlib reentrancy support:
 - [newlib reentrancy](https://sourceware.org/newlib/libc.html#Reentrancy)
 - [CLib FreeRTOS support library](https://github.com/Infineon/clib-support)
 - [newlib and FreeRTOS configuration hints](http://www.nadler.com/embedded/newlibAndFreeRTOS.html)
+
+
+### `configMAX_PRIORITIES`
+
+This parameter specifies the maximum number of discrete priorities for RTOS tasks, which are numbered 0 to configMAX_PRIORITIES-1.
+
+1. If timer functionality is enabled, `configTIMER_TASK_PRIORITY` parameter in `FreeRTOSConfig.h` should have value in the range of 0 to configMAX_PRIORITIES-1.
+
+2. Any user created RTOS-tasks should have priority value from 0 to configMAX_PRIORITIES-1.
+
+**Note:** If the task priority is defined equal to or greater than configMAX_PRIORITIES then in case of Release mode the priority will be adjusted to configMAX_PRIORITIES - 1, in case of Debug mode the application will assert.
 
 
 ## More information

@@ -1,10 +1,10 @@
 /*
- * FreeRTOS Kernel V10.4.3 LTS Patch 2
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.5.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2019-2021 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
- * Updated configuration to support PSoC 6 MCU.
+ * Updated configuration to support CM4.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -130,6 +130,17 @@ PSoC 6 __NVIC_PRIO_BITS = 3
 6
 7 (low)     KERNEL_INTERRUPT_PRIORITY       111xxxxx (0xFF)
 
+
+CAT3 XMC devices __NVIC_PRIO_BITS = 6
+
+0 (high)
+1           MAX_API_CALL_INTERRUPT_PRIORITY 000001xx (0x07)
+..
+..
+..
+..
+63 (low)    KERNEL_INTERRUPT_PRIORITY       111111xx (0xFF)
+
 !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html
 
@@ -142,7 +153,11 @@ Put MAX_SYSCALL_INTERRUPT_PRIORITY in top __NVIC_PRIO_BITS bits of CM4 register
 NOTE For IAR compiler make sure that changes of this macro is reflected in
 file portable\TOOLCHAIN_IAR\COMPONENT_CM4\portasm.s in PendSV_Handler: routine
 */
+#ifdef COMPONENT_CAT3
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x07
+#else
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x3F
+#endif
 /* configMAX_API_CALL_INTERRUPT_PRIORITY is a new name for configMAX_SYSCALL_INTERRUPT_PRIORITY
  that is used by newer ports only. The two are equivalent. */
 #define configMAX_API_CALL_INTERRUPT_PRIORITY   configMAX_SYSCALL_INTERRUPT_PRIORITY

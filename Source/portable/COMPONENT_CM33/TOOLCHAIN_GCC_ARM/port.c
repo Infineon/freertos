@@ -1,6 +1,9 @@
 /*
- * FreeRTOS Kernel V10.4.3 LTS Patch 2
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.5.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
  * Copyright (C) 2019-2021 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
@@ -192,7 +195,7 @@
 #define portMPU_ENABLE_BIT                    ( 1UL << 0UL )
 
 /* Expected value of the portMPU_TYPE register. */
-#define portEXPECTED_MPU_TYPE_VALUE           ( 8UL << 8UL ) /* 8 regions, unified. */
+#define portEXPECTED_MPU_TYPE_VALUE           ( configTOTAL_MPU_REGIONS << 8UL )
 /*-----------------------------------------------------------*/
 
 /**
@@ -648,6 +651,12 @@ FREERTOS_COMMON_SECTION_END
             extern uint32_t __privileged_sram_start__[];
             extern uint32_t __privileged_sram_end__[];
         #endif /* defined( __ARMCC_VERSION ) */
+
+        /* The only permitted number of regions are 8 or 16. */
+        configASSERT( ( configTOTAL_MPU_REGIONS == 8 ) || ( configTOTAL_MPU_REGIONS == 16 ) );
+
+        /* Ensure that the configTOTAL_MPU_REGIONS is configured correctly. */
+        configASSERT( portMPU_TYPE_REG == portEXPECTED_MPU_TYPE_VALUE );
 
         /* Check that the MPU is present. */
         if( portMPU_TYPE_REG == portEXPECTED_MPU_TYPE_VALUE )
@@ -1194,7 +1203,7 @@ void vPortEndScheduler( void ) /* PRIVILEGED_FUNCTION */
                 }
                 else
                 {
-                    /* Attr1 in MAIR0 is configured as normal memory. */
+                    /* Attr0 in MAIR0 is configured as normal memory. */
                     xMPUSettings->xRegionsSettings[ ulRegionNumber ].ulRLAR |= portMPU_RLAR_ATTR_INDEX0;
                 }
             }

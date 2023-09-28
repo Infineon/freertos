@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.4.3 LTS Patch 2
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.5.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2019-2021 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
@@ -64,7 +64,7 @@
 #define configCPU_CLOCK_HZ                      160000000
 #define configTICK_RATE_HZ                      1000u
 #define configMAX_PRIORITIES                    7
-#define configMINIMAL_STACK_SIZE                64
+#define configMINIMAL_STACK_SIZE                128
 #define configMAX_TASK_NAME_LEN                 16
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
@@ -81,7 +81,7 @@
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         1
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
-#define configTOTAL_HEAP_SIZE                   1024
+#define configTOTAL_HEAP_SIZE                   10240
 #define configAPPLICATION_ALLOCATED_HEAP        0
 
 /* Hook function related definitions. */
