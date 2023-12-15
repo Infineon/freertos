@@ -6,8 +6,6 @@ FreeRTOS is supplied as standard C source files built along with the other C fil
 
 **Note:** Cortex&reg;-R4 (CR4) is currently supported only on GCC_ARM
 
-**Note:** Currently only GCC_ARM and ARM compilers are supported On CYW920829M2EVK-02 (20829B0 CM33) kit
-
 See the FreeRTOS API documentation at <a href="https://www.freertos.org/a00106.html" target="_blank">FreeRTOS web page</a>.
 
 ## Features

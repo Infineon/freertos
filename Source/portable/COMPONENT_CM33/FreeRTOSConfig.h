@@ -53,6 +53,7 @@
  * CY_CFG_PWR_DEEPSLEEP_LATENCY - Deep Sleep Latency (ms)
  */
 #include "cycfg_system.h"
+#include "cy_device_headers.h"
 #endif
 
 #warning This is a template. Copy this file to your project and remove this line. Refer to FreeRTOS README.md for usage details.
@@ -81,7 +82,7 @@ extern uint32_t SystemCoreClock;
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 
 /* Compile-time macros to enable or disable TrustZone, Memory Protection Unit (MPU) and Floating Point Unit (FPU) support. */
-#if defined (CY_DEVICE_CAT1D) 
+#if (defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U))
 #define configENABLE_FPU                        1
 #else
 #define configENABLE_FPU                        0
@@ -126,7 +127,7 @@ interrupt safe FreeRTOS API functions can be called.
 !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html
 */
-#if defined (CY_DEVICE_CAT1D) 
+#if (__SAUREGION_PRESENT==1)
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x40
 #else
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x3F

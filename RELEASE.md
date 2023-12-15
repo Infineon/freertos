@@ -6,12 +6,15 @@
 - Ports for GCC, IAR, Arm&reg; compilers and Cortex&reg;-M0 (CM0), Cortex&reg;-M0+ (CM0P), Cortex&reg;-M4 (CM4), Cortex&reg;-M33 (CM33), Cortex&reg;-R4 (CR4) and Cortex&reg;-M7 (CM7) CPUs
 - *FreeRTOSConfig.h* template with the recommended configuration options
 - Cortex&reg;-R4 (CR4) is currently supported only on GCC_ARM
-- Currently only GCC_ARM and ARM compilers are supported On CYW920829M2EVK-02 (20829B0 CM33) kit
 
 See [README.md](./README.md) for a complete description of FreeRTOS.
 
 
 ## Changelog
+
+### v10.5.001
+
+- Added support for 20829B0 kit (CM33) on IAR compiler
 
 ### v10.5.0
 

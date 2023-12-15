@@ -71,11 +71,11 @@ vResetPrivilege:
 	bx lr									/* Return to the caller. */
 /*-----------------------------------------------------------*/
 
-/*----------------- Privileged Functions --------------------*/
+/*----------------- Section .cy_os_common --------------------*/
 
 /*-----------------------------------------------------------*/
 
-	SECTION privileged_functions:CODE:NOROOT(2)
+	SECTION .cy_os_common:CODE:NOROOT(2)
 	THUMB
 /*-----------------------------------------------------------*/
 
@@ -134,13 +134,6 @@ vRestoreContextOfFirstTask:
 #endif /* configENABLE_MPU */
 /*-----------------------------------------------------------*/
 
-vRaisePrivilege:
-	mrs  r0, control						/* Read the CONTROL register. */
-	bic r0, r0, #1							/* Clear the bit 0. */
-	msr  control, r0						/* Write back the new CONTROL value. */
-	bx lr									/* Return to the caller. */
-/*-----------------------------------------------------------*/
-
 vStartFirstTask:
 	ldr r0, =0xe000ed08						/* Use the NVIC offset register to locate the stack. */
 	ldr r0, [r0]							/* Read the VTOR register which gives the address of vector table. */
@@ -151,15 +144,6 @@ vStartFirstTask:
 	dsb
 	isb
 	svc 2									/* System call to start the first task. portSVC_START_SCHEDULER = 2. */
-/*-----------------------------------------------------------*/
-
-ulSetInterruptMask:
-	mrs r0, basepri							/* r0 = basepri. Return original basepri value. */
-	mov r1, #configMAX_SYSCALL_INTERRUPT_PRIORITY
-	msr basepri, r1							/* Disable interrupts upto configMAX_SYSCALL_INTERRUPT_PRIORITY. */
-	dsb
-	isb
-	bx lr									/* Return. */
 /*-----------------------------------------------------------*/
 
 vClearInterruptMask:
@@ -258,5 +242,33 @@ SVC_Handler:
 	mrsne r0, psp
 	b vPortSVCHandler_C
 /*-----------------------------------------------------------*/
+/*----------------- Privileged Functions --------------------*/
+
+/*-----------------------------------------------------------*/
+
+	SECTION privileged_functions:CODE:NOROOT(2)
+	THUMB
+/*-----------------------------------------------------------*/
+
+
+
+vRaisePrivilege:
+	mrs  r0, control						/* Read the CONTROL register. */
+	bic r0, r0, #1							/* Clear the bit 0. */
+	msr  control, r0						/* Write back the new CONTROL value. */
+	bx lr									/* Return to the caller. */
+/*-----------------------------------------------------------*/
+
+
+
+ulSetInterruptMask:
+	mrs r0, basepri							/* r0 = basepri. Return original basepri value. */
+	mov r1, #configMAX_SYSCALL_INTERRUPT_PRIORITY
+	msr basepri, r1							/* Disable interrupts upto configMAX_SYSCALL_INTERRUPT_PRIORITY. */
+	dsb
+	isb
+	bx lr									/* Return. */
+/*-----------------------------------------------------------*/
+
 
 	END

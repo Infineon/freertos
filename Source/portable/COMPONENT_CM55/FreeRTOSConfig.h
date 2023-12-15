@@ -123,7 +123,7 @@ interrupt safe FreeRTOS API functions can be called.
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html
 */
 
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x40
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x3F
 
 /* configMAX_API_CALL_INTERRUPT_PRIORITY is a new name for configMAX_SYSCALL_INTERRUPT_PRIORITY
  that is used by newer ports only. The two are equivalent. */
