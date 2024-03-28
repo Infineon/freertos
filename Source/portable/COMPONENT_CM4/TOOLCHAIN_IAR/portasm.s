@@ -3,7 +3,7 @@
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
- * Copyright (C) 2019-2020 Cypress Semiconductor Corporation, or a subsidiary of
+ * Copyright (C) 2019-2024 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
  *
  * Updated function names to be compliant with CMSIS standard names.

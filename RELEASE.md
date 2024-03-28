@@ -9,8 +9,16 @@
 
 See [README.md](./README.md) for a complete description of FreeRTOS.
 
+## Known Issues
+| Problem | Workaround |
+| ------- | ---------- |
+| In Eclipse IDE, call stack does not show when debugging multithreaded applications with FreeRTOS. | <p> To see the call stack properly, do one of the following options:</p> <p>1. Disable compiler optimization. To disable compiler optimization on ARMC6 & GCC_ARM toolchains, please add <b>CFLAGS+=-O0</b> to application Makefile</p><p>2. Add fno-omit-frame-pointer in application Makefile by adding <b>CFLAGS+=-fno-omit-frame-pointer</b>.</p><p> 3. Above two options will increase some amount of code size. If there is a memory constraint, then please use Visual Studio Code IDE for debugging. To use, Visual Studio Code for ModusToolbox&trade; IDE Refer User Manual section at [ModusToolbox&trade; Software page](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/?gad_source=1&gclid=CjwKCAjw17qvBhBrEiwA1rU9w5xTYwo11nLYqYNEXBi1i4tmOyH5sadgBM1QXq5VSh7eOgmbzeGi-hoCtacQAvD_BwE&gclsrc=aw.ds). </p> |
 
 ## Changelog
+
+### v10.5.002
+
+- Added support of DSRAM feature for 20829B0 kit (CM33) on IAR compiler
 
 ### v10.5.001
 
@@ -104,10 +112,10 @@ This version of FreeRTOS was validated for compatibility with the following soft
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software environment                | 3.1     |
-| Peripheral driver library (`mtb-pdl-cat1`)              | 3.0.0   |
+| ModusToolbox&trade; software environment                | 3.2     |
+| Peripheral driver library (`mtb-pdl-cat1`)              | 3.10.0  |
 | GCC compiler                                            | 11.3.1  |
-| IAR compiler                                            | 9.30    |
+| IAR compiler                                            | 9.40.2  |
 | Arm&reg; compiler 6                                     | 6.16    |
 
 
