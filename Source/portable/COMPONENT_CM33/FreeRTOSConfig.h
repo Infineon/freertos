@@ -82,14 +82,20 @@ extern uint32_t SystemCoreClock;
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 
 /* Compile-time macros to enable or disable TrustZone, Memory Protection Unit (MPU) and Floating Point Unit (FPU) support. */
-#if (defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U))
-#define configENABLE_FPU                        1
-#else
+/* configENABLE_FPU is set to 0 for the platforms which doesnt support hardware FPU and
+when application makefile has VFP_SELECT configured as softfloat */
+#if defined(COMPONENT_CYW20829) || defined(COMPONENT_CYW89829) || defined(MTB_SOFTFLOAT)
 #define configENABLE_FPU                        0
+#else
+#define configENABLE_FPU                        1
 #endif
 #define configENABLE_MPU                        0
 #define configENABLE_TRUSTZONE                  0
+#if defined (COMPONENT_SECURE_DEVICE)
+#define configRUN_FREERTOS_SECURE_ONLY          1
+#else
 #define configRUN_FREERTOS_SECURE_ONLY          0
+#endif
 
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         1
@@ -127,10 +133,10 @@ interrupt safe FreeRTOS API functions can be called.
 !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html
 */
-#if (__SAUREGION_PRESENT==1)
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x40
-#else
+#if defined(COMPONENT_SECURE_DEVICE) || defined(COMPONENT_CYW20829) || defined(COMPONENT_CYW89829)
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x3F
+#else
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x40
 #endif
 
 /* configMAX_API_CALL_INTERRUPT_PRIORITY is a new name for configMAX_SYSCALL_INTERRUPT_PRIORITY
@@ -206,10 +212,13 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
 #define configUSE_TICKLESS_IDLE                 0
 #endif
 
-/* Deep Sleep Latency Configuration */
-#if ( CY_CFG_PWR_DEEPSLEEP_LATENCY > 0 )
-#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP   CY_CFG_PWR_DEEPSLEEP_LATENCY
-#endif
+/* Deep Sleep Latency Configuration
+ * FreeRTOS configEXPECTED_IDLE_TIME_BEFORE_SLEEP will be always set to 2 and should
+ * not be modified. With this, vApplicationSleep will be always called and the deepsleep latency configuration from
+ * device configurator is handeled in vApplicationSleep function. To configure the deepsleep latency with
+ * different value user should configure it from the device configurator.
+ */
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP   2
 
 /* Allocate newlib reeentrancy structures for each RTOS task.
  * The system behavior is toolchain-specific.

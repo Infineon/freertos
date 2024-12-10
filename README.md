@@ -258,6 +258,9 @@ This parameter specifies the maximum number of discrete priorities for RTOS task
 
 **Note:** If the task priority is defined equal to or greater than configMAX_PRIORITIES then in case of Release mode the priority will be adjusted to configMAX_PRIORITIES - 1, in case of Debug mode the application will assert.
 
+### `configENABLE_FPU`
+
+This parameter enables or disables the Floating Point Unit (FPU) support in the system.
 
 ## More information
 

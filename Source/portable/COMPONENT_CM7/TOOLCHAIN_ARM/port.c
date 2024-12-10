@@ -715,6 +715,10 @@ __attribute__( ( weak ) ) void vPortSetupTimerInterrupt( void )
      */
     #if defined (COMPONENT_CAT1) 
     NVIC_SetVector (SysTick_IRQn, (long unsigned int)&xPortSysTickHandler);
+#if !defined (CY_DISABLE_XMC7000_DATA_CACHE)
+    SCB_CleanInvalidateDCache();
+    SCB_InvalidateICache();
+#endif
     #endif
 }
 /*-----------------------------------------------------------*/

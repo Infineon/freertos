@@ -16,6 +16,12 @@ See [README.md](./README.md) for a complete description of FreeRTOS.
 
 ## Changelog
 
+### v10.5.003
+
+- Updated the Cortex&reg;-M33 *FreeRTOSConfig.h* template to support FreeRTOS on secure devices.
+- Setting Cortex&reg;-M33 Deep Sleep Latency Configuration to 2 ticks to allow vApplicationSleep function to handle different kind of sleep modes, like simple MCU sleep without tickless.
+- Added support for D-cache enablement on XMC7200 devices (CM7).
+
 ### v10.5.002
 
 - Added support of DSRAM feature for 20829B0 kit (CM33) on IAR compiler
@@ -112,11 +118,11 @@ This version of FreeRTOS was validated for compatibility with the following soft
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software environment                | 3.2     |
-| Peripheral driver library (`mtb-pdl-cat1`)              | 3.10.0  |
+| ModusToolbox&trade; software environment                | 3.3     |
+| Peripheral driver library (`mtb-pdl-cat1`)              | 3.13.0  |
 | GCC compiler                                            | 11.3.1  |
-| IAR compiler                                            | 9.40.2  |
-| Arm&reg; compiler 6                                     | 6.16    |
+| IAR compiler                                            | 9.50.2  |
+| Arm&reg; compiler 6                                     | 6.22    |
 
 
 ## Known issues
