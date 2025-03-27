@@ -198,6 +198,7 @@ void vStartFirstTask( void ) /* __attribute__ (( naked )) PRIVILEGED_FUNCTION */
         "													\n"
         "   .align 4										\n"
         "xVTORConst: .word 0xe000ed08						\n"
+        ".ltorg                                             \n"/* Add the .ltorg instruction to place literals near the code */
         ::"i" ( portSVC_START_SCHEDULER ) : "memory"
     );
 }

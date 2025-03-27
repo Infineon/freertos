@@ -16,6 +16,10 @@ See [README.md](./README.md) for a complete description of FreeRTOS.
 
 ## Changelog
 
+### v10.5.004
+
+- Updated CM33 GCC_ARM port file to fix build issues with -flto linker option.
+
 ### v10.5.003
 
 - Updated the Cortex&reg;-M33 *FreeRTOSConfig.h* template to support FreeRTOS on secure devices.
@@ -118,8 +122,8 @@ This version of FreeRTOS was validated for compatibility with the following soft
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software environment                | 3.3     |
-| Peripheral driver library (`mtb-pdl-cat1`)              | 3.13.0  |
+| ModusToolbox&trade; software environment                | 3.4     |
+| Peripheral driver library (`mtb-pdl-cat1`)              | 3.16.0  |
 | GCC compiler                                            | 11.3.1  |
 | IAR compiler                                            | 9.50.2  |
 | Arm&reg; compiler 6                                     | 6.22    |
