@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.6.2
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -65,7 +65,7 @@ PendSV_Handler:
 
 	stmdb sp!, {r0, r3}
 	/* value MUST be equal to configMAX_SYSCALL_INTERRUPT_PRIORITY */
-	mov r0, #0x3F
+	mov r0, #0x20
 	msr basepri, r0
 	dsb
 	isb
@@ -151,4 +151,3 @@ vPortEnableVFP:
 
 
 	END
-

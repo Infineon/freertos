@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.6.2
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2019-2024 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
@@ -184,6 +184,10 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
  * FreeRTOS's configUSE_NEWLIB_REENTRANT to work with the toolchain-specific C library.
  * The compatible implementations are also provided by the clib-support library.
  */
+#if defined(__llvm__) && !defined(__ARMCC_VERSION)
+#define configUSE_PICOLIBC_TLS                  1
+#else
 #define configUSE_NEWLIB_REENTRANT              1
+#endif
 
 #endif /* FREERTOS_CONFIG_H */

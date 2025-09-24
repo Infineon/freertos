@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.6.2
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -45,21 +45,6 @@
  * for the header files above, but not in this file, in order to generate the
  * correct privileged Vs unprivileged linkage and placement. */
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750 !e9021 See comment above. */
-
-/* The following bit fields convey control information in a task's event list
- * item value.  It is important they don't clash with the
- * taskEVENT_LIST_ITEM_VALUE_IN_USE definition. */
-#if configUSE_16_BIT_TICKS == 1
-    #define eventCLEAR_EVENTS_ON_EXIT_BIT    0x0100U
-    #define eventUNBLOCKED_DUE_TO_BIT_SET    0x0200U
-    #define eventWAIT_FOR_ALL_BITS           0x0400U
-    #define eventEVENT_BITS_CONTROL_BYTES    0xff00U
-#else
-    #define eventCLEAR_EVENTS_ON_EXIT_BIT    0x01000000UL
-    #define eventUNBLOCKED_DUE_TO_BIT_SET    0x02000000UL
-    #define eventWAIT_FOR_ALL_BITS           0x04000000UL
-    #define eventEVENT_BITS_CONTROL_BYTES    0xff000000UL
-#endif
 
 typedef struct EventGroupDef_t
 {
@@ -533,7 +518,8 @@ EventBits_t xEventGroupGetBitsFromISR( EventGroupHandle_t xEventGroup )
 EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
                                 const EventBits_t uxBitsToSet )
 {
-    ListItem_t * pxListItem, * pxNext;
+    ListItem_t * pxListItem;
+    ListItem_t * pxNext;
     ListItem_t const * pxListEnd;
     List_t const * pxList;
     EventBits_t uxBitsToClear = 0, uxBitsWaitedFor, uxControlBits;
@@ -669,6 +655,42 @@ void vEventGroupDelete( EventGroupHandle_t xEventGroup )
     }
     #endif /* configSUPPORT_DYNAMIC_ALLOCATION */
 }
+/*-----------------------------------------------------------*/
+
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+    BaseType_t xEventGroupGetStaticBuffer( EventGroupHandle_t xEventGroup,
+                                           StaticEventGroup_t ** ppxEventGroupBuffer )
+    {
+        BaseType_t xReturn;
+        EventGroup_t * pxEventBits = xEventGroup;
+
+        configASSERT( pxEventBits );
+        configASSERT( ppxEventGroupBuffer );
+
+        #if ( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+        {
+            /* Check if the event group was statically allocated. */
+            if( pxEventBits->ucStaticallyAllocated == ( uint8_t ) pdTRUE )
+            {
+                *ppxEventGroupBuffer = ( StaticEventGroup_t * ) pxEventBits;
+                xReturn = pdTRUE;
+            }
+            else
+            {
+                xReturn = pdFALSE;
+            }
+        }
+        #else /* configSUPPORT_DYNAMIC_ALLOCATION */
+        {
+            /* Event group must have been statically allocated. */
+            *ppxEventGroupBuffer = ( StaticEventGroup_t * ) pxEventBits;
+            xReturn = pdTRUE;
+        }
+        #endif /* configSUPPORT_DYNAMIC_ALLOCATION */
+
+        return xReturn;
+    }
+#endif /* configSUPPORT_STATIC_ALLOCATION */
 /*-----------------------------------------------------------*/
 
 /* For internal use only - execute a 'set bits' command that was pended from

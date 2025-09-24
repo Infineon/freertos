@@ -2,20 +2,28 @@
 
 ## What's included?
 
-- FreeRTOS kernel 10.5.0
-- Ports for GCC, IAR, Arm&reg; compilers and Cortex&reg;-M0 (CM0), Cortex&reg;-M0+ (CM0P), Cortex&reg;-M4 (CM4), Cortex&reg;-M33 (CM33), Cortex&reg;-R4 (CR4) and Cortex&reg;-M7 (CM7) CPUs
+- FreeRTOS kernel 10.6.2
+- Ports for GCC, IAR, LLVM, Arm&reg; compilers 
+- Cores: Cortex&reg;-M0 (CM0), Cortex&reg;-M0+ (CM0P), Cortex&reg;-M4 (CM4), Cortex&reg;-M33 (CM33), Cortex&reg;-M55 (CM55), Cortex&reg;-R4 (CR4) and Cortex&reg;-M7 (CM7)
 - *FreeRTOSConfig.h* template with the recommended configuration options
 - Cortex&reg;-R4 (CR4) is currently supported only on GCC_ARM
+- Add Arm&reg; TrustZone NSC functionality support for CM33 core.
 
 See [README.md](./README.md) for a complete description of FreeRTOS.
 
-## Known Issues
-| Problem | Workaround |
-| ------- | ---------- |
-| In Eclipse IDE, call stack does not show when debugging multithreaded applications with FreeRTOS. | <p> To see the call stack properly, do one of the following options:</p> <p>1. Disable compiler optimization. To disable compiler optimization on ARMC6 & GCC_ARM toolchains, please add <b>CFLAGS+=-O0</b> to application Makefile</p><p>2. Add fno-omit-frame-pointer in application Makefile by adding <b>CFLAGS+=-fno-omit-frame-pointer</b>.</p><p> 3. Above two options will increase some amount of code size. If there is a memory constraint, then please use Visual Studio Code IDE for debugging. To use, Visual Studio Code for ModusToolbox&trade; IDE Refer User Manual section at [ModusToolbox&trade; Software page](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/?gad_source=1&gclid=CjwKCAjw17qvBhBrEiwA1rU9w5xTYwo11nLYqYNEXBi1i4tmOyH5sadgBM1QXq5VSh7eOgmbzeGi-hoCtacQAvD_BwE&gclsrc=aw.ds). </p> |
 
 ## Changelog
 
+### v10.6.2
+
+- Updated to upstream FreeRTOS kernel version 10.6.2
+- Enabled support for LLVM_ARM toolchain and Updated the *FreeRTOSConfig.h* template to enable LLVM configuration option required by RTOS support libraries:
+
+   ```
+   #define configUSE_PICOLIBC_TLS                  1
+   ```
+- Enabled support for CM33 TrustZone NSC functionality.
+   
 ### v10.5.004
 
 - Updated CM33 GCC_ARM port file to fix build issues with -flto linker option.
@@ -122,26 +130,29 @@ This version of FreeRTOS was validated for compatibility with the following soft
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software environment                | 3.4     |
-| Peripheral driver library (`mtb-pdl-cat1`)              | 3.16.0  |
-| GCC compiler                                            | 11.3.1  |
+| ModusToolbox&trade; software environment                | 3.6     |
+| GCC compiler                                            | 14.2.1  |
 | IAR compiler                                            | 9.50.2  |
 | Arm&reg; compiler 6                                     | 6.22    |
+| LLVM ARM Compiler                                       | 19.1.5  |
 
-
-## Known issues
-
-Usage of the Arm&reg; compiler 6 with enabled LTO (link-time optimization) option can result in an incorrect behavior of the application in some scenarios. It is recommended to avoid enabling LTO compiler/linker flags (`-flto`)
-when using Arm&reg; Compiler 6 with FreeRTOS applications.
+## Known Issues
+| Problem | Workaround |
+| ------- | ---------- |
+| In the ModusToolbox&trade Eclipse IDE, the call stack does not show the debugging of multithreaded applications with FreeRTOS | <p> To see the call stack properly, do one of the following options:</p> <p>1. Disable the compiler optimization. To disable the compiler optimization on ARMC6 & GCC_ARM toolchains, add <b>CFLAGS+=-O0</b> to the application Makefile</p><p>2. Add the fno-omit-frame-pointer to the application Makefile by adding <b>CFLAGS+=-fno-omit-frame-pointer</b>.</p><p> 3. The above two options increase the code size. If there is a memory constraint, use the Visual Studio Code IDE for debugging. To use, Visual Studio Code for ModusToolbox™ Eclipse IDE, refer to the section user guide section at [ModusToolbox&trade; Software page](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/?gad_source=1&gclid=CjwKCAjw17qvBhBrEiwA1rU9w5xTYwo11nLYqYNEXBi1i4tmOyH5sadgBM1QXq5VSh7eOgmbzeGi-hoCtacQAvD_BwE&gclsrc=aw.ds). </p> |
+| The usage of the Arm® compiler 6 with enabled LTO | enabled LTO (link-time optimization) option can result in the application incorrect behavior in some scenarios. Recommended: avoid enabling LTO compiler/linker flags (`-flto`) when using Arm® Compiler 6 with FreeRTOS applications.|
 
 ### More information
 
 - [FreeRTOS README.md](./README.md)
 - [FreeRTOS API documentation](http://www.freertos.org/a00106.html)
+- [FreeRTOS port documentation](https://infineon.github.io/freertos/html/index.html)
 - [FreeRTOS homepage](https://www.freertos.org/index.html)
-- [ModusToolbox&trade; software environment, quick start guide, documentation, and videos](https://www.cypress.com/products/modustoolbox-software-environment)
-- [PSoC&trade; 6 technical reference manuals](https://www.cypress.com/search/all?f%5B0%5D=meta_type%3Atechnical_documents&f%5B1%5D=resource_meta_type%3A583&f%5B2%5D=field_related_products%3A114026)
-- [PSoC&trade; 6 datasheets](https://www.cypress.com/search/all?f%5B0%5D=meta_type%3Atechnical_documents&f%5B1%5D=field_related_products%3A114026&f%5B2%5D=resource_meta_type%3A575)
-- [Cypress semiconductor](http://www.cypress.com) website
+- [ModusToolbox&trade; software environment, quick start guide, documentation, and videos](https://www.infineon.com/design-resources/development-tools/sdk/modustoolbox-software)
+- [Code Examples for ModusToolbox Software](https://github.com/Infineon/Code-Examples-for-ModusToolbox-Software)
+- [ModusToolbox Device Configurator Tool Guide](https://www.infineon.com/ModusToolboxDeviceConfig)
+- [Infineon Technologies AG](https://www.infineon.com)
+
 ---
-© Cypress Semiconductor Corporation, 2019-2021
+© Cypress Semiconductor Corporation (an Infineon company), 2019-2025.
+

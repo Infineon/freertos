@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.6.2
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2019-2024 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
@@ -131,7 +131,7 @@ PSoC 6 __NVIC_PRIO_BITS = 3
 7 (low)     KERNEL_INTERRUPT_PRIORITY       111xxxxx (0xFF)
 
 
-CAT3 XMC devices __NVIC_PRIO_BITS = 6
+XMC4XXX devices __NVIC_PRIO_BITS = 6
 
 0 (high)
 1           MAX_API_CALL_INTERRUPT_PRIORITY 000001xx (0x07)
@@ -153,10 +153,10 @@ Put MAX_SYSCALL_INTERRUPT_PRIORITY in top __NVIC_PRIO_BITS bits of CM4 register
 NOTE For IAR compiler make sure that changes of this macro is reflected in
 file portable\TOOLCHAIN_IAR\COMPONENT_CM4\portasm.s in PendSV_Handler: routine
 */
-#ifdef COMPONENT_CAT3
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x07
+#if defined(CY_XMC4XXX_DEVICES)
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x04
 #else
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x3F
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x20
 #endif
 /* configMAX_API_CALL_INTERRUPT_PRIORITY is a new name for configMAX_SYSCALL_INTERRUPT_PRIORITY
  that is used by newer ports only. The two are equivalent. */
@@ -246,6 +246,10 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
  * FreeRTOS's configUSE_NEWLIB_REENTRANT to work with the toolchain-specific C library.
  * The compatible implementations are also provided by the clib-support library.
  */
+#if defined(__llvm__) && !defined(__ARMCC_VERSION)
+#define configUSE_PICOLIBC_TLS                  1
+#else
 #define configUSE_NEWLIB_REENTRANT              1
+#endif
 
 #endif /* FREERTOS_CONFIG_H */

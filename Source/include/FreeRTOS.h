@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.6.2
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -55,8 +55,49 @@
 #endif
 /* *INDENT-ON* */
 
+/* Common DEFINE for XMC4X devices for Full Hobbes Update 
+ * Platforms covered under this DEFINE are as follows:
+ * XMC43XX, XMC44XX, XMC45XX, XMC47XX, XMC48XX
+ */
+#if defined(COMPONENT_XMC43XX) || defined(COMPONENT_XMC44XX) || defined(COMPONENT_XMC45XX) || defined(COMPONENT_XMC47XX) || defined(COMPONENT_XMC48XX)
+    #define CY_XMC4XXX_DEVICES
+#endif
+
+/* Acceptable values for configTICK_TYPE_WIDTH_IN_BITS. */
+#define TICK_TYPE_WIDTH_16_BITS    0
+#define TICK_TYPE_WIDTH_32_BITS    1
+#define TICK_TYPE_WIDTH_64_BITS    2
+
 /* Application specific configuration options. */
 #include "FreeRTOSConfig.h"
+
+#if !defined( configUSE_16_BIT_TICKS ) && !defined( configTICK_TYPE_WIDTH_IN_BITS )
+    #error Missing definition:  One of configUSE_16_BIT_TICKS and configTICK_TYPE_WIDTH_IN_BITS must be defined in FreeRTOSConfig.h.  See the Configuration section of the FreeRTOS API documentation for details.
+#endif
+
+#if defined( configUSE_16_BIT_TICKS ) && defined( configTICK_TYPE_WIDTH_IN_BITS )
+    #error Only one of configUSE_16_BIT_TICKS and configTICK_TYPE_WIDTH_IN_BITS must be defined in FreeRTOSConfig.h.  See the Configuration section of the FreeRTOS API documentation for details.
+#endif
+
+/* Define configTICK_TYPE_WIDTH_IN_BITS according to the
+ * value of configUSE_16_BIT_TICKS for backward compatibility. */
+#ifndef configTICK_TYPE_WIDTH_IN_BITS
+    #if ( configUSE_16_BIT_TICKS == 1 )
+        #define configTICK_TYPE_WIDTH_IN_BITS    TICK_TYPE_WIDTH_16_BITS
+    #else
+        #define configTICK_TYPE_WIDTH_IN_BITS    TICK_TYPE_WIDTH_32_BITS
+    #endif
+#endif
+
+/* Set configUSE_MPU_WRAPPERS_V1 to 1 to use MPU wrappers v1. */
+#ifndef configUSE_MPU_WRAPPERS_V1
+    #define configUSE_MPU_WRAPPERS_V1    0
+#endif
+
+/* Set configENABLE_ACCESS_CONTROL_LIST to 1 to enable access control list support. */
+#ifndef configENABLE_ACCESS_CONTROL_LIST
+    #define configENABLE_ACCESS_CONTROL_LIST    0
+#endif
 
 /* Basic FreeRTOS definitions. */
 #include "projdefs.h"
@@ -72,41 +113,26 @@
 /* Required if struct _reent is used. */
 #if ( configUSE_NEWLIB_REENTRANT == 1 )
 
-/* Note Newlib support has been included by popular demand, but is not
- * used by the FreeRTOS maintainers themselves.  FreeRTOS is not
- * responsible for resulting newlib operation.  User must be familiar with
- * newlib and must provide system-wide implementations of the necessary
- * stubs. Be warned that (at the time of writing) the current newlib design
- * implements a system-wide malloc() that must be provided with locks.
- *
- * See the third party link http://www.nadler.com/embedded/newlibAndFreeRTOS.html
- * for additional information. */
-    #include <reent.h>
+    #include "newlib-freertos.h"
 
-    #define configUSE_C_RUNTIME_TLS_SUPPORT    1
-
-    #ifndef configTLS_BLOCK_TYPE
-        #define configTLS_BLOCK_TYPE           struct _reent
-    #endif
-
-    #ifndef configINIT_TLS_BLOCK
-        #define configINIT_TLS_BLOCK( xTLSBlock )    _REENT_INIT_PTR( &( xTLSBlock ) )
-    #endif
-
-    #ifndef configSET_TLS_BLOCK
-        #define configSET_TLS_BLOCK( xTLSBlock )    _impure_ptr = &( xTLSBlock )
-    #endif
-
-    #ifndef configDEINIT_TLS_BLOCK
-        #define configDEINIT_TLS_BLOCK( xTLSBlock )    _reclaim_reent( &( xTLSBlock ) )
-    #endif
 #endif /* if ( configUSE_NEWLIB_REENTRANT == 1 ) */
+
+/* Must be defaulted before configUSE_PICOLIBC_TLS is used below. */
+#ifndef configUSE_PICOLIBC_TLS
+    #define configUSE_PICOLIBC_TLS    0
+#endif
+
+#if ( configUSE_PICOLIBC_TLS == 1 )
+
+    #include "picolibc-freertos.h"
+
+#endif /* if ( configUSE_PICOLIBC_TLS == 1 ) */
 
 #ifndef configUSE_C_RUNTIME_TLS_SUPPORT
     #define configUSE_C_RUNTIME_TLS_SUPPORT    0
 #endif
 
-#if ( ( configUSE_NEWLIB_REENTRANT == 0 ) && ( configUSE_C_RUNTIME_TLS_SUPPORT == 1 ) )
+#if ( configUSE_C_RUNTIME_TLS_SUPPORT == 1 )
 
     #ifndef configTLS_BLOCK_TYPE
         #error Missing definition:  configTLS_BLOCK_TYPE must be defined in FreeRTOSConfig.h when configUSE_C_RUNTIME_TLS_SUPPORT is set to 1.
@@ -123,7 +149,7 @@
     #ifndef configDEINIT_TLS_BLOCK
         #error Missing definition:  configDEINIT_TLS_BLOCK must be defined in FreeRTOSConfig.h when configUSE_C_RUNTIME_TLS_SUPPORT is set to 1.
     #endif
-#endif /* if ( ( configUSE_NEWLIB_REENTRANT == 0 ) && ( configUSE_C_RUNTIME_TLS_SUPPORT == 1 ) ) */
+#endif /* if ( configUSE_C_RUNTIME_TLS_SUPPORT == 1 ) */
 
 /** Define start of the function placed to the SRAM area by the linker */
 #if defined(__ARMCC_VERSION)
@@ -138,6 +164,11 @@
 
 #define FREERTOS_COMMON_SECTION_BEGIN _Pragma("default_function_attributes = @\".text.cy_os_common\"")
 #define FREERTOS_COMMON_SECTION_END _Pragma("default_function_attributes = ")
+
+#elif defined(__llvm__) && !defined(__ARMCC_VERSION)
+
+#define FREERTOS_COMMON_SECTION_BEGIN __attribute__((section(".text.cy_os_common")))
+#define FREERTOS_COMMON_SECTION_END
 
 #elif defined(__GNUC__)
 #if defined(__clang__)
@@ -185,8 +216,10 @@
     #error Missing definition:  configUSE_TICK_HOOK must be defined in FreeRTOSConfig.h as either 1 or 0.  See the Configuration section of the FreeRTOS API documentation for details.
 #endif
 
-#ifndef configUSE_16_BIT_TICKS
-    #error Missing definition:  configUSE_16_BIT_TICKS must be defined in FreeRTOSConfig.h as either 1 or 0.  See the Configuration section of the FreeRTOS API documentation for details.
+#if ( ( configTICK_TYPE_WIDTH_IN_BITS != TICK_TYPE_WIDTH_16_BITS ) && \
+    ( configTICK_TYPE_WIDTH_IN_BITS != TICK_TYPE_WIDTH_32_BITS ) &&   \
+    ( configTICK_TYPE_WIDTH_IN_BITS != TICK_TYPE_WIDTH_64_BITS ) )
+    #error Macro configTICK_TYPE_WIDTH_IN_BITS is defined to incorrect value.  See the Configuration section of the FreeRTOS API documentation for details.
 #endif
 
 #ifndef configUSE_CO_ROUTINES
@@ -1314,7 +1347,7 @@ typedef struct xSTATIC_TCB
     #if ( configGENERATE_RUN_TIME_STATS == 1 )
         configRUN_TIME_COUNTER_TYPE ulDummy16;
     #endif
-    #if ( ( configUSE_NEWLIB_REENTRANT == 1 ) || ( configUSE_C_RUNTIME_TLS_SUPPORT == 1 ) )
+    #if ( configUSE_C_RUNTIME_TLS_SUPPORT == 1 )
         configTLS_BLOCK_TYPE xDummy17;
     #endif
     #if ( configUSE_TASK_NOTIFICATIONS == 1 )

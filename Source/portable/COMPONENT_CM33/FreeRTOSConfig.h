@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.6.2
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2019-2024 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
@@ -68,6 +68,7 @@ extern uint32_t SystemCoreClock;
 #define configMAX_PRIORITIES                    7
 /* Increase the stack size to 256 to support ds-ram feature */
 #define configMINIMAL_STACK_SIZE                256
+#define configMINIMAL_SECURE_STACK_SIZE         256
 #define configMAX_TASK_NAME_LEN                 16
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
@@ -90,12 +91,12 @@ when application makefile has VFP_SELECT configured as softfloat */
 #define configENABLE_FPU                        1
 #endif
 #define configENABLE_MPU                        0
-#define configENABLE_TRUSTZONE                  0
-#if defined (COMPONENT_SECURE_DEVICE)
-#define configRUN_FREERTOS_SECURE_ONLY          1
+#if defined (COMPONENT_FREERTOS_TZ) || defined (COMPONENT_SECURE_DEVICE) 
+#define configENABLE_TRUSTZONE                  1
 #else
+#define configENABLE_TRUSTZONE                  0
+#endif         
 #define configRUN_FREERTOS_SECURE_ONLY          0
-#endif
 
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         1
@@ -212,13 +213,10 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
 #define configUSE_TICKLESS_IDLE                 0
 #endif
 
-/* Deep Sleep Latency Configuration
- * FreeRTOS configEXPECTED_IDLE_TIME_BEFORE_SLEEP will be always set to 2 and should
- * not be modified. With this, vApplicationSleep will be always called and the deepsleep latency configuration from
- * device configurator is handeled in vApplicationSleep function. To configure the deepsleep latency with
- * different value user should configure it from the device configurator.
- */
-#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP   2
+/* Deep Sleep Latency Configuration */
+#if ( CY_CFG_PWR_DEEPSLEEP_LATENCY > 0 )
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP   CY_CFG_PWR_DEEPSLEEP_LATENCY
+#endif
 
 /* Allocate newlib reeentrancy structures for each RTOS task.
  * The system behavior is toolchain-specific.
@@ -232,6 +230,10 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
  * FreeRTOS's configUSE_NEWLIB_REENTRANT to work with the toolchain-specific C library.
  * The compatible implementations are also provided by the clib-support library.
  */
+#if defined(__llvm__) && !defined(__ARMCC_VERSION)
+#define configUSE_PICOLIBC_TLS                  1
+#else
 #define configUSE_NEWLIB_REENTRANT              1
+#endif
 
 #endif /* FREERTOS_CONFIG_H */

@@ -1,0 +1,7 @@
+{
+    "core": {
+        "id": "cafcab16-cb51-5b8b-a3f4-a730d678fda1",
+        "name": "freertos",
+        "version": "10.6.2.1073"
+    }
+}

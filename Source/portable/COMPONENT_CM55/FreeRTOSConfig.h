@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.6.2
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  * Copyright (C) 2019-2024 Cypress Semiconductor Corporation, or a subsidiary of
  * Cypress Semiconductor Corporation.  All Rights Reserved.
@@ -65,7 +65,7 @@ extern uint32_t SystemCoreClock;
 #define configCPU_CLOCK_HZ                      SystemCoreClock
 #define configTICK_RATE_HZ                      ((TickType_t ) 1000)
 #define configMAX_PRIORITIES                    7
-#define configMINIMAL_STACK_SIZE                128
+#define configMINIMAL_STACK_SIZE                256
 #define configMAX_TASK_NAME_LEN                 16
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
@@ -81,7 +81,11 @@ extern uint32_t SystemCoreClock;
 #define configENABLE_MVE                        0
 
 /* Compile-time macros to enable or disable TrustZone, Memory Protection Unit (MPU) and Floating Point Unit (FPU) support. */ 
+#if defined(MTB_SOFTFLOAT)
+#define configENABLE_FPU                        0
+#else
 #define configENABLE_FPU                        1
+#endif
 #define configENABLE_MPU                        0
 #define configENABLE_TRUSTZONE                  0
 #define configRUN_FREERTOS_SECURE_ONLY          0
@@ -123,7 +127,7 @@ interrupt safe FreeRTOS API functions can be called.
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html
 */
 
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x3F
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    0x20
 
 /* configMAX_API_CALL_INTERRUPT_PRIORITY is a new name for configMAX_SYSCALL_INTERRUPT_PRIORITY
  that is used by newer ports only. The two are equivalent. */
@@ -214,6 +218,10 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
  * FreeRTOS's configUSE_NEWLIB_REENTRANT to work with the toolchain-specific C library.
  * The compatible implementations are also provided by the clib-support library.
  */
+#if defined(__llvm__) && !defined(__ARMCC_VERSION)
+#define configUSE_PICOLIBC_TLS                  1
+#else
 #define configUSE_NEWLIB_REENTRANT              1
+#endif
 
 #endif /* FREERTOS_CONFIG_H */
